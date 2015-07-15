@@ -1,0 +1,55 @@
+Software Design
+
+                                     * * *
+
+#Design and UML
+UML structure
+• Class name
+• fields (- for private field)
+• methods (- for private method, + for public)
+
+A hollow triangular arrow head means that the block is extending the other
+block.
+
+A line to a plus sign indicates that the class is enclosed in another class.
+
+<hr>
+
+———————-
+
+Area
+
+———————-
+
+• + bool contains (Point p)
+
+———————-
+
+
+<hr>
+^  (hollow arrow head to represent extending) 
+
+
+———————-
+
+Shape
+
+———————-
+
+• + Point contained()
+• + void draw()
+
+———————-
+
+
+<hr>
+^  (hollow arrow head to represent extending) 
+
+———————-
+
+Circle
+
+———————-
+
+• +init radius
+• +point center()
