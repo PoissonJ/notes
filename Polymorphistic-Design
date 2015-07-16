@@ -1,0 +1,27 @@
+Polymorphistic-Design
+
+#File Explorer
+The design creates a sitution where we do not care what type the file is.
+Instead we can care about the methods it needs to implement and be assured that
+the correct methods will be called for that object.
+
+##Item Class
+{{{cpp
+Item {
+virtual void open() = 0
+virtual string getName() = 0
+virtual void print() = 0  // Use for GUI interface
+}
+}}}
+
+###Directory class extends Item
+{{{cpp
+void open()  // Open and display folder contents
+bool isFolder()  // Return true
+}}}
+
+###File class
+
+####Data File extends File
+
+####Binary File extends File
