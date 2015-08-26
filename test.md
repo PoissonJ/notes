@@ -54,7 +54,7 @@ delimited block for Pandoc to syntax highlight it:
 
 ~~~python
 import time
-# Quick, count to ten!
+ # Quick, count to ten!
 for i in range(10):
     # (but not *too* quick)
     time.sleep(0.5)
@@ -146,7 +146,7 @@ term/definition pair to spread things out more.)
 Here's a "line block":
 
     | Line one
-    |
+    | Line two
     | Line tree
 
 and images can be specified like so:
