@@ -47,3 +47,15 @@ main function:
 
 Statements:
   : Command to be executed when the program runs
+
+## Printf
+
+%d :
+  : placeholder for int
+
+`printf("height %d\n", height)`
+
+%f :
+  : placeholder for floating point
+
+`printf("Profit: $.2f\n", profit)`  This prints 2 decimal points
