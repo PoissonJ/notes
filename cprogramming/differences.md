@@ -3,4 +3,5 @@
  * No OOP
  * .c extension
  * Compile with gcc instead of g++ usually
- * cout = printf()
+ * cout = printf(). Should use f at the end of the float number as a best
+     practice
