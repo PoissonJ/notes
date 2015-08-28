@@ -24,3 +24,131 @@ possible in each step
 
 This method starts taking longer than an insertion sort, but it does not grow as
 fast.
+
+## 1.1 Propisitional Logic
+
+Proposition:
+  : Statement that is either True or False. Very black and white
+
+Proposition:
+
+    It is raining. It is sunny. 1+1=2
+
+    X + 1 > 3 is *Not* a Proposition! We are missing some details
+
+p, q, r, s... are some variables used in Propositional logic
+
+
+>p = `1 + 1 = 2`
+>
+>q = `It is sunny.`
+
+r = p ^ q:
+  : p `and` q. The `^` is a conjunction
+
+
+ p   q    p^q
+ --  --  ----
+ T   T   T
+ T   F   F
+ F   T   F
+ F   F   F
+ ------------
+
+`p v q`:
+  : p `or` q
+
+ p   q    p v q
+ --  --  ------
+ T   T   T
+ T   F   T
+ F   T   T
+ F   F   F
+ ------------
+
+This `or` is also known as **inclusive** `or`.
+
+There is an **exclusive** `or`.
+
+
+t:
+  : `-`p. `Not` p. Symbol is actually a '-' with a little leg. Could be a `~`
+    as well.
+
+p   -p
+--  --
+T   F
+F   T
+
+The `not` is just the oppisite of p
+
+p:
+  : The Gators will not win the national title
+
+q:
+  : The Gators will get a new head coach
+
+-p^q:
+  : The Gators will not win the national title but they will get a new coach[1]
+
+[1]: Page 11
+
+u:
+  :p->q: if the Gators do not win the national title they will get a new head
+  coach. the `->` means imples. `If p then q`, `If p, q`
+
+ p   q   p->q
+ ------------
+ T   T   T
+ T   F   F
+ F   T   T
+ F   F   T
+ ------------
+
+    Only way to logicalally disprove, must be p and not q. This is testing if p
+    `implies` q
+
+p<->q:
+  : If and only if. `Bidirectional` implication. Also known as `iff`
+
+
+ p   q   p<->q
+ ------------
+ T   T   T
+ T   F   F
+ F   T   F
+ F   F   T
+ ------------
+
+    If and only if p is true, q is true. If they are both true, there is nothing to
+    disprove the assumption
+
+&nbsp;
+
+r:
+  : p->q
+
+s:
+  : q->q
+
+t:
+  : -q->-p
+
+ p   q   r   s  t
+ ----------------
+ T   T   T   T  T
+ T   F   F   T  F
+ F   T   *T* *F*T
+ F   F   T   T  T
+ ----------------
+
+    Logically falacy of `converse` [2]. *r<->t*
+
+[2]: Page 8
+
+&nbsp;
+
+p + q:
+ : `+ with a circle around it` is exclusive or. `p <-> -q`
+
+
