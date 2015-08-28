@@ -1,15 +1,13 @@
-# Introduction and Chapter 1
+# Computer Abstractions and Technology
 
-## Computer Abstractions and Technology
-
-### The computer revolution
+## The computer revolution
 
 Moore's Law
   : chip integration is doubled every **18** (or 80) months
 
 Computer processors become more and more powerful and take less power
 
-### Classes of Computers
+## Classes of Computers
 
 Personal computers
 
@@ -29,7 +27,7 @@ Embedded computers
  * Hidden as components of the system
  * Stringent power/performance/cost constraints
 
-### The PostPC Era
+## The PostPC Era
 
 Personal Mobile Device
 
@@ -41,7 +39,7 @@ Cloud Computing
  * Software as a Service (SaaS)
  * Amazon and Google
 
-### 8 Great Ideas - Architect
+## 8 Great Ideas - Architect
 
  * Moore's Law
  * Abstraction to simplify design
@@ -52,7 +50,7 @@ Cloud Computing
  * Hierarchy of memories
  * Dependability
 
-### Below Your Program
+## Below Your Program
 
 Applications Software
   : Written in high-level language
@@ -61,11 +59,11 @@ System software
 Hardware
   : processor...
 
-#### Levels of Program Code
+### Levels of Program Code
 
 High-level --> Assembly language --> Hardware representation (10101001)
 
-### Components of a computer
+## Components of a computer
 
 All Computers have the same components
 
@@ -73,7 +71,7 @@ All Computers have the same components
  * Processor
  * Memory
 
-### Inside the Processor (CPU)
+## Inside the Processor (CPU)
 
 Datapath
   : performs operations on data
