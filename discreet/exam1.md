@@ -25,7 +25,7 @@ possible in each step
 This method starts taking longer than an insertion sort, but it does not grow as
 fast.
 
-## 1.1 Propisitional Logic
+# 1.1 Propisitional Logic
 
 Proposition:
   : Statement that is either True or False. Very black and white
@@ -75,10 +75,10 @@ t:
   : `-`p. `Not` p. Symbol is actually a '-' with a little leg. Could be a `~`
     as well.
 
-p   -p
---  --
-T   F
-F   T
+    p   -p
+    --  --
+    T   F
+    F   T
 
 The `not` is just the oppisite of p
 
@@ -142,7 +142,7 @@ t:
  F   F   T   T  T
  ----------------
 
-    Logically falacy of `converse` [2]. *r<->t*
+    Logically falacy of `converse` [2]. r<->t
 
 [2]: Page 8
 
@@ -151,4 +151,74 @@ t:
 p + q:
  : `+ with a circle around it` is exclusive or. `p <-> -q`
 
+
+# 1.2 English to Propisitional Logic
+
+Example:
+
+> You cannot ride the roller coaster if you are under 4 feet tall unless you are
+> older than 16 years old
+
+`q: You can ride the roller coaster ride`
+
+`r: You are under 4 feel tall`
+
+`s: You are older than 16 yrs.`
+
+**(r ^ -s) -> -q**
+
+&nbsp;
+
+Example:
+
+
+`q: You can see the movie`
+
+`r: You are over 18 years old`
+
+`s: You have the permission of the parent`
+
+**r v q <-> q**
+
+The way the book words it...
+
+**q -> r v s**
+
+ q   r    s
+ --  --  ----
+ T   T   T
+ T   T   F
+ T   T   F
+ F   F   F
+ ------------
+
+## Search Engines
+
+Search: *university gainesville -florida* to exclude `florida`
+
+Search: *"university gainesville"* to search `only university gainesville`
+
+## Logic Puzzles
+
+Example 7: Knights always tell the truth
+
+`p: Knight`
+
+`-p: Knave`
+
+a:"B is a knight"
+
+b:"The two of us are opposite types"
+
+**(a and -b) or (-a and b)**
+
+ a   b   a's statement  b's statement Possible?
+ --  --  -------------- ------------- --------
+ T   T   T              F             No-b lied
+ T   F   F              T             No-a lied, b told the truth
+ F   T   T              T             No-a can't tell the truth
+ F   F   F              F             Yes
+ ------------
+
+> *Both A and B are knaves*
 
