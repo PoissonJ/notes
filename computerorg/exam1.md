@@ -5,7 +5,7 @@
 ## The computer revolution
 
 Moore's Law
-  : chip integration is doubled every **18** (or 80) months
+  : chip integration is doubled every **18** months
 
 Computer processors become more and more powerful and take less power
 
@@ -155,5 +155,44 @@ Performance improved by
 
  * Reducing total number of clock cycles
  * Increasing clock rate
+
+
+
+## CPI in More detail
+
+CPI:
+  : How much time on average to execute each cycle (Cycle per instruction)
+
+Affected by programming language, compiler, algorithms, instruction set
+architecture...
+
+*Computer Processor organizationa nd microprocesser affects the speed*
+
+## Reducing Power
+
+The power wall:
+
+ * We cannot reduce voltage further
+ * We cannot remove more heat
+
+Uniprocessor Performance is constrained by power, instruction-level
+parallelism,  and memory latency
+
+##Multiprocessors
+
+More than one processor per chip
+
+Requires explicitly parallel programming
+
+## Concluding Remarks
+
+ * Cost/performance is improving
+ * Hierarchical layers of abstraction in both hardware and software
+ * ...
+
+# Chapter 2 Instruction Set
+
+ * Appendix A: MIPS Instruction Set
+ * Appendix B: Digital Logic Basics
 
 
