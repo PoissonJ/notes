@@ -176,3 +176,4 @@ Space actually needed:
   time for n inserts is linear, theta(n), but this will be 2n+1 which is why we
   use the first formula
 
+C++ uses multiplicative power of 1.5
