@@ -1,11 +1,11 @@
-# Data Structures Exam 1
+# Intro
 
 Comparison Count. Pick an instance characteristic .... n
 
     For insertion sort, pick n= number of elements to be sorted.
 
 Step Count
-  : A step is an amount of computeing that does not depend on the instance
+  : A step is an amount of computing that does not depend on the instance
     characteristic n
 
 steps per execution is not always 0 or 1. For example
@@ -16,29 +16,29 @@ steps per execution is not always 0 or 1. For example
 > **Algorithimic imporvement is more useful than hardware imporvement**
 
 
-## Performance Measurement
+# Performance Measurement
 
 Uses:
  * Determine practicality of algorithm
- * Predict runt ime on large instance
- * Compare 2 algorithms that hace differeny asymptotic complexity
+ * Predict run time on large instance
+ * Compare 2 algorithms that have different asymptotic complexity
     O(n) and O(n^2)
 
-### Limitations of Analysis
+## Limitations of Analysis
 
- * Does not acount for constant factors
+ * Does not account for constant factors
  * Constant factor may dominate. (1000n vs n^2)
 
 > Modern computers have a hierarchical memory organization with different
 > access time for memory at different levels. Main memory can be 100x slower
-> than the cache. nalysis does not account for this
+> than the cache. analysis does not account for this
 
 Need:
 
  * Worst case data
  * Best case data
 
-#### Timing in C++
+### Timing in C++
 
 ~~~c
 double clocksPerMillis =
@@ -65,16 +65,31 @@ When measuring sorting, must use same unsorted array each time
 UNIX `time MyProgram` takes into account busy cores doing other tasks
 
 
-## Data Structures
+# Data Structures
 
-Data Object
+Design:
+  : In every activity, there are a number of possible solutions. We must pick
+    one when implementing software. Sometime the solution is not optimum for
+    one solution. Design is the process of selecting one element in a viable
+    solution space.
+
+Data Object:
   : Set or collection of instances. Days of the week or A list of numbers.
     Could be related or not, doesn't matter
 
-> The relationshjips are usllay specified by specifying operations on one or
+> The relationships are usually specified by specifying operations on one or
 > more instances. Data Structures are a set of data that you do operations to.
 
-### Linear (or Ordered) lists
+Data Structure Specification
+
+ * Language independent
+    + Abstract Data Type
+    + Just English telling what each method of the class will do
+ * C++
+    + Abstract Class
+    + Purely virtual
+
+## Linear (or Ordered) lists
 
 Things one after the other
 
@@ -85,7 +100,8 @@ Things one after the other
  * List size is n
  * e0 is the zero'th (or front) element in the list
 
-Example
+Example:
+
  * (Jack, Jill, Bob)
 
 Operations
@@ -97,4 +113,66 @@ Operations
  * Erase(Index)
  * Insert(Index, Element)- nice to have the arguments go in natural english
      order "Insert into slot 5 'a'"
+    + Use a for loop to shift everything over to the right and then input the
+        argument
+
+Extending a C++ class -
+  : (From an already created C++ pure virtual class)
+
+~~~c
+template<class T>
+class arrayList: public linearList<T> {
+    //Code for all abstract methods of a linearList must come here
+}
+~~~
+
+### Linear List Array Representation
+
+Use a one-dimensional array element[ ]
+
+**L = (a,b,c,d,e)**
+
+Store element i of list in element[i]
+
+Representation of the list include:
+
+ * Mapping from right to left
+ * Mapping that skips every other position
+ * Wrap around mapping
+    + Useful for Queues and Stacks
+
+### Potential Problems
+
+We do not know how many elements will be in the list, therefore we could run out
+of allocated memory. Therefore, we must pick an initial length and dynamically
+increase as needed. Use another variable to store current length of the array
+
+Solution:
+
+ * First create a new and larger array
+
+~~~c
+T * new Array = new T[15];
+// There will be a pointer to the new array
+~~~
+
+ * Now copy elements from old array to new one
+ * Finally, delete old array and rename new array
+
+~~~c
+delete[] element;
+element = new Array;
+arraylength = 15;
+~~~
+
+How Big should the new array be?
+  : At least 1 more than current array length. Cost of increasing array length
+  when array is full is theta(old length). Cost of n insert operations done on
+  an initially empty linear list increases by theta(n^2). THIS IS VERY
+  EXPENSIVE!
+
+Space actually needed:
+  : 2 * newLength - 1. Or, you could double the array length. In this case, the
+  time for n inserts is linear, theta(n), but this will be 2n+1 which is why we
+  use the first formula
 
