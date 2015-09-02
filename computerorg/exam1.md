@@ -166,7 +166,7 @@ CPI:
 Affected by programming language, compiler, algorithms, instruction set
 architecture...
 
-*Computer Processor organizationa nd microprocesser affects the speed*
+*Computer Processor organizationa and microprocesser affects the speed*
 
 ## Reducing Power
 
@@ -194,5 +194,95 @@ Requires explicitly parallel programming
 
  * Appendix A: MIPS Instruction Set
  * Appendix B: Digital Logic Basics
+
+## MIPS Examples
+
+`add a, b, c # a gets b + c`
+
+ * Add and Subtract, three operands
+ * `add` is called opcode and the variables are called operands
+ * `#` is a comment
+ * *Design Principle 1:* Simplicity favors regularity
+     + Regulatiry makes implementation simpler
+     + Simplicity enables higher performance at lower cost
+
+Example:
+
+ * C code:
+
+~~~c
+f = (g+h) - (i+j);
+~~~
+
+ * MIPS
+
+| add t0, g, h
+| add t1, i, j
+| sub f, t0, t1 `# Put into f the subtraciton of t0 and t1`
+
+ * Operands can be in: Register, memory and immediate
+
+Example:
+
+ * C code:
+
+~~~c
+g = h + A[8]
+~~~
+
+    + g in $s1, h in $s2, base address of A in $s3
+
+ * Compiled MIPS
+     + Index 8 requires offset of 32
+        - 4 Bytes per word. 8,  4 byte words. 8 * 4 = 32
+
+| lw $t0, 32($s3)    `# Load word that is already is $s3`
+| add $s, $s2, $t0
+
+Example:
+
+ * C code:
+
+~~~c
+A[12] = h + A[8]
+~~~
+
+    + g in $s2, base address of A in $s3
+
+ * Compiled MIPS
+     + Index 8 requires offset of 32
+
+| lw  $t0, 32($s3)    `# Load word that is already is $s3`
+| add $t0, $s2, $t0
+| sw  $t0, 48($s3)    `# Store word
+
+
+### Register Operands
+
+Register:
+  : Data moves in and out of Register. Register can be accessed very fast due
+    to small number of them. Data and the register is simple. *Design Principle
+    2:* Smaller is faster. Register can do simple arithimetic for example.
+
+ * Registers are accessed from the MIPS Register Table. For example, $zero is
+     reister 1 and $t0 is register 5, the first register you can use
+
+### Memory
+
+Memory is a storage location and given its address, you can access the memory
+
+#### Endians and Alignment
+
+&nbsp;
+
+Byte address is 8 locations. Word-aligned word at byte address must be at 4 or
+0. Halfword-aligned word at 2. Byte-aligned (non-aligned) word, at byte address
+1.
+
+Big-endian:
+  : Most significant byte "first"
+
+Little-endian:
+  : Least significant byte "first"
 
 
