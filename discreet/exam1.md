@@ -222,3 +222,27 @@ b:"The two of us are opposite types"
 
 > *Both A and B are knaves*
 
+# 1.3 Propositional Equivalences
+
+Tautology:
+  : `p or -p`. Always true
+
+Contradiction:
+  : `p and -p`. Always False
+
+Find a case where `p<-->q` is a tautology for some p and q. Also known as
+`p===q`, or they are logically equivalent to each other.
+
+## De Morgans Laws
+
+`-(p or q) === -p and -q`. Distributing the `'-'`
+
+`-(p and q) === -p or -q`. Distributing the `'-'`
+
+`-(p v q v r)` === `-p ^ -q ^ -r`
+
+## Logical Statements
+
+`P and True' is P
+
+`P or False' is P
