@@ -167,13 +167,131 @@ arraylength = 15;
 
 How Big should the new array be?
   : At least 1 more than current array length. Cost of increasing array length
-  when array is full is theta(old length). Cost of n insert operations done on
-  an initially empty linear list increases by theta(n^2). THIS IS VERY
-  EXPENSIVE!
+    when array is full is theta(old length). Cost of n insert operations done on
+    an initially empty linear list increases by theta(n^2). THIS IS VERY
+    EXPENSIVE!
 
 Space actually needed:
   : 2 * newLength - 1. Or, you could double the array length. In this case, the
-  time for n inserts is linear, theta(n), but this will be 2n+1 which is why we
-  use the first formula
+    time for n inserts is linear, theta(n), but this will be 2n+1 which is why we
+    use the first formula
 
-C++ uses multiplicative power of 1.5
+**C++ uses multiplicative power of 1.5 in its implementation**
+
+### Code
+
+> General purpose implementation
+
+**Create an Empty List**
+
+~~~c
+arrayLinear<int>a(100), b;
+arrayLinear<double>c(10), d;
+
+linearList<int>*d = new arrayList<int>(1000);
+linearList<char>*f = new arrayList<char>(1000);
+
+// F is a pointer to a type arrayList. The object holds a pointer
+// and variables for the max size and size to the list
+~~~
+
+** Using the List**
+
+~~~c
+cout << a.size() << endl;
+a.insert(0, 2);
+d->insert(0, 4);
+a.output();
+cout << a << endl; // Operator overloading
+
+a.erase(0);
+if(a.empty()) a.insert(0, 5);
+~~~
+
+**Array of Linerar List**
+
+~~~c
+lineraList<int>*x[4];
+x[0] = new arrayList<int>(20);
+x[1] = new chain<int>();
+x[2] = new chain<int>();
+x[0] = new arrayList<int>(15);
+
+for (int i = 0; i < 4; i++) {
+    x[i].insert(0, i);
+}
+~~~
+
+**The Class arrayList**
+
+~~~c
+// include statements come here
+using namespace std;
+template<class T>
+class arrayList : public linearList<T> {
+    public:
+    // Constructor, copt constructor and destructor
+    arrayList(int initialCapacity = 10);
+    ~arrayList)_ {delete [] element;}
+
+    protected:
+    void checkIndex(int theIndex) const;
+        // throw ilegalIndex if theIndex invalid
+    T* element;  // 1D array to hold list elemtnes
+
+    ...
+}
+~~~
+
+*Be careful with `const` placement. If placed at the end, the method cannot
+change the object for example.*
+
+**The whole purpose if to create little, simple methods that reduce the overall
+complexity of the class. If your method is 20+ lines long, you are asking for
+trouble.**
+
+## Iterator
+
+**Allows you to iterate through and have access to each of the elements in a
+data structure.**
+
+Bidirecitonal Iterator:
+  : Allows both forward and backward iteration
+
+ + {iterator(T * the Posiion)}
+
+### Iterator class
+
+ + assume bidirecitonal
+ + assume arrayList has begin() and end() methods
+
+~~~c
+arrayList<int>::iterator xHere = x.begin();
+arrayList<int>::iterator xEnd = x.end();
+for (; xHere != xEnd; xHere++) {
+    // examine xHere
+}
+~~~
+
+## Linked List
+
+**Nodes connected by pointers**
+
+ * A linked list in which each node represents one elemet
+
+`Chain` is the class while `ChainNode` is a `struct` in the class
+
+&nbsp;
+
+&nbsp;
+
+**Visual Representation**
+
+ ----
+ ptr
+ ----
+ Attributes
+ **
+ ---
+
+
