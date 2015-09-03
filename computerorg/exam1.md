@@ -236,7 +236,7 @@ g = h + A[8]
      + Index 8 requires offset of 32
         - 4 Bytes per word. 8,  4 byte words. 8 * 4 = 32
 
-| lw $t0, 32($s3)    `# Load word that is already is $s3`
+| lw  $t0, 32($s3)    `# Load word that is already is $s3`
 | add $s, $s2, $t0
 
 Example:
