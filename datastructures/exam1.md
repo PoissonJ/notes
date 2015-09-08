@@ -300,3 +300,6 @@ to it and have a memory leak
 
 Destructors will take care of the features in an object but will not delete the
 pointer to the object itself. That's what the `delete` keyword does.
+
+The priary benefit of this class over an array list is that you do not have to
+sepecify a length for the array right off the bat.
