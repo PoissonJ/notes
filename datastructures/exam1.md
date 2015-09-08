@@ -294,4 +294,9 @@ for (; xHere != xEnd; xHere++) {
  **
  ---
 
+When **erasing** a node, you change where the pointer pointing to that node is
+pointing. However, first you have to delete the node so you don't lose access
+to it and have a memory leak
 
+Destructors will take care of the features in an object but will not delete the
+pointer to the object itself. That's what the `delete` keyword does.
