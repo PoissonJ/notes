@@ -1,6 +1,6 @@
 # Chapter 1 Proposition Logic
 
-# Sorting and Time Compleity
+# Sorting and Time Complexity
 
 ## Insertion sort
 
@@ -25,7 +25,7 @@ possible in each step
 This method starts taking longer than an insertion sort, but it does not grow as
 fast.
 
-# 1.1 Propisitional Logic
+# 1.1 Propositional Logic
 
 Proposition:
   : Statement that is either True or False. Very black and white
@@ -152,7 +152,7 @@ p + q:
  : `+ with a circle around it` is exclusive or. `p <-> -q`
 
 
-# 1.2 English to Propisitional Logic
+# 1.2 English to Propositional Logic
 
 Example:
 
@@ -246,7 +246,7 @@ Find a case where `p<-->q` is a tautology for some p and q. Also known as
 `P and True' is P
 
 `P or False' is P
-#1.4
+# 1.4
 
 `x = 1 + 4` itself is not a Proposition. It is, however, a function that
 translates into a proposition when we give it certain values.
@@ -289,3 +289,41 @@ false because not *every* number makes the statement P(x,2) true.
 `Q(x): x knows c++`
 
 There exists one student at UF who knows both.
+
+# 1.5 Nested Quantifiers
+
+Recall that upside down A means all and upside down E means there exists one
+
+Sometimes you want to combine the E and A
+
+`X is the students`
+
+`Y is the course`
+
+We can say:
+  : `Ex Ay Enrolled(x,y)` There exists some student enrolled in every course
+
+We can say:
+  : `Ax Ey Enrolled(x,y)` Each student is enrolled in at least one course
+
+We can say:
+  : `Ay Ex Enrolled(x,y)` Every course has at least one enrolled student
+
+**THE ORDER MATTERS**
+
+ ***
+
+` not ExAy Enrolled(x,y)` is the same as `Ax not [Ay enrolled(x,y)]` which is
+the same as `Ax Ey not Enrolled(x,y)`
+
+ ***
+
+`x = students`
+
+`y = class`
+
+`C(Randy Goldbery, CS252)`, *Randy is enrolled in CS 252*
+
+`Ex(X(x,Math 222) ^ C(x, CS 252))`, *There exists a student that is enrolled in
+both Math 222 and CS 252*
+
