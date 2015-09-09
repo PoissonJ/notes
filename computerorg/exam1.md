@@ -256,6 +256,12 @@ A[12] = h + A[8]
 | add $t0, $s2, $t0
 | sw  $t0, 48($s3)    `# Store word
 
+**No Subtract Method** Instead must add a negative value
+
+**To Move From One Register To Another**, use the constant zero
+
+|add $t2. $s1, $zero
+
 
 
 ### Register Operands
@@ -271,6 +277,10 @@ Register:
 ### Memory
 
 Memory is a storage location and given its address, you can access the memory
+
+ * Registers are faster to access than memory
+ * Operating on memory data requires lods and stores
+ * Compiler must use registers for variables as much as possible
 
 #### Endians and Alignment
 

@@ -246,3 +246,46 @@ Find a case where `p<-->q` is a tautology for some p and q. Also known as
 `P and True' is P
 
 `P or False' is P
+#1.4
+
+`x = 1 + 4` itself is not a Proposition. It is, however, a function that
+translates into a proposition when we give it certain values.
+
+`P(x,y)`
+
+To make it a proposition we need to give the function values for x and y.
+
+`P(1,2)` is False
+
+`P(2,1)` is True
+
+`x = 1 + 4` Is known as the `Predicate` for this example
+
+## Domain and Range
+
+`f(x) = x^2`
+
+Range is either True or False for predicate logic. Domain is what x represents,
+for example, a student
+
+`Upside-down A`:
+  : "For all"
+
+`Upside-down E`:
+  : "There exists at least one"
+
+`Ev(xer) P(x,2)`. Upside-down e base for all real numbers. There is at least one
+number to make this statement true. If using the upside-down a, this would be
+false because not *every* number makes the statement P(x,2) true.
+
+`Double-r` symbol represents all the reals
+
+`E` symbol represents *within*
+
+## Example
+
+`P(x): x can speak Russian.`
+
+`Q(x): x knows c++`
+
+There exists one student at UF who knows both.
