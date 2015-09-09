@@ -257,6 +257,7 @@ A[12] = h + A[8]
 | sw  $t0, 48($s3)    `# Store word
 
 
+
 ### Register Operands
 
 Register:
@@ -285,4 +286,10 @@ Big-endian:
 Little-endian:
   : Least significant byte "first"
 
+***
 
+
+**Design Principle**:
+ : Good Design demands good compromises
+
+ * Keep formats as similar as possible
