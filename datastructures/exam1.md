@@ -67,6 +67,8 @@ UNIX `time MyProgram` takes into account busy cores doing other tasks
 
 # Data Structures
 
+Operations do not require time, **Algorithms** do!
+
 Design:
   : In every activity, there are a number of possible solutions. We must pick
     one when implementing software. Sometime the solution is not optimum for
@@ -111,7 +113,7 @@ Operations
  * IndexOf(element) - Items could be repeated, however, which would yield an
      incorrect index. -1 is returned if the item is not found
  * Erase(Index)
- * Insert(Index, Element)- nice to have the arguments go in natural english
+ * Insert(Index, Element)- nice to have the arguments go in natural English
      order "Insert into slot 5 'a'"
     + Use a for loop to shift everything over to the right and then input the
         argument
@@ -188,14 +190,14 @@ Space actually needed:
 arrayLinear<int>a(100), b;
 arrayLinear<double>c(10), d;
 
-linearList<int>*d = new arrayList<int>(1000);
-linearList<char>*f = new arrayList<char>(1000);
+linearList<int> * d = new arrayList<int>(1000);
+linearList<char> * f = new arrayList<char>(1000);
 
 // F is a pointer to a type arrayList. The object holds a pointer
 // and variables for the max size and size to the list
 ~~~
 
-** Using the List**
+**Using the List**
 
 ~~~c
 cout << a.size() << endl;
@@ -277,7 +279,7 @@ for (; xHere != xEnd; xHere++) {
 
 **Nodes connected by pointers**
 
- * A linked list in which each node represents one elemet
+ * A linked list in which each node represents one element
 
 `Chain` is the class while `ChainNode` is a `struct` in the class
 
@@ -301,5 +303,35 @@ to it and have a memory leak
 Destructors will take care of the features in an object but will not delete the
 pointer to the object itself. That's what the `delete` keyword does.
 
-The priary benefit of this class over an array list is that you do not have to
-sepecify a length for the array right off the bat.
+The primary benefit of this class over an array list is that you do not have to
+specify a length for the array right off the bat.
+
+A **Header Node** that points to the first element in the chain can be used to
+make insertion and deletion easier. Another way to use this is instead of a
+header node, use a pointer to the first node. Then if you want to add an
+element to the beginning/end, you can copy the node the firstNode pointer is
+pointing to, and then attach the new node to the chain.
+
+## Simulated Pointers
+
+Limitations of C++ Pointers
+
+ * Held in Ram so if you cut the power, they are gone
+ * No arithmetic (Can't find the middle of the array)
+
+Simulated Pointer:
+  : Pointers are integers, not the usual C++ pointer
+
+**Don't use unless you really need to.** For 99/100 situations, C++ pointers
+will work just fine.
+
+## Arrays
+
+Multi-dimensional arrays in C++ are represented as an 'array of arrays'.
+
+If the multi-dimensional array is a perfect square, you can store everything in
+one array and use math to determine when a new row begins and ends, but a
+disadvantage of this is that there is one big chunk of memory allocated to
+holding this big array.
+
+
