@@ -311,12 +311,12 @@ We can say:
 
 **THE ORDER MATTERS**
 
- ***
+ ******
 
-` not ExAy Enrolled(x,y)` is the same as `Ax not [Ay enrolled(x,y)]` which is
+`not ExAy Enrolled(x,y)` is the same as `Ax not [Ay enrolled(x,y)]` which is
 the same as `Ax Ey not Enrolled(x,y)`
 
- ***
+ ******
 
 `x = students`
 
@@ -327,3 +327,43 @@ the same as `Ax Ey not Enrolled(x,y)`
 `Ex(X(x,Math 222) ^ C(x, CS 252))`, *There exists a student that is enrolled in
 both Math 222 and CS 252*
 
+# 1.6 Rules of Inference
+
+Using De Morgans laws we can make inferences about statements. We can then
+infer certain conclusions based on those inferences.
+
+`p = You have a current password`
+
+`L = You can log onto the network`
+
+We can infer..
+
+ * `p -> L`
+ * `p`
+ * Therefore (three dots) `L` is true
+
+ ******
+
+ *Prove that it rained*
+
+ What we know..
+
+ * `r = It rains.`
+ * `f = It is foggy.`
+ * `s = The sailing race will be held.`
+ * `d = The life-saving demo will go on.`
+ * `t = The trophy will be awarded.`
+ * `-r or -f -> s and d`
+ * `s -> t`
+ * `-t`
+
+We can infer..
+
+Since we know that the trophy was not awarded (`-t`), and `s -> t`, we can say
+`-s`.
+
+We now know that the right hand side of `-r or -f -> s and d` must be false,
+therefore `-(-r or -f)` and De Morgan's laws tells us `(r and f)`
+
+`-(r or -f)` can be written as `(r and f)` which implies `r` must be true.
+Therefore **it rained**.
