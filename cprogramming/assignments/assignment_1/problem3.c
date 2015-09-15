@@ -49,6 +49,11 @@ void run() {
     // Initalize addition factors array to pinpoint the user's number
     int additionFactors[4] = {10, 5, 2, 1};
 
+    int inputOutputArray[20];
+    inputOutputArray[0] = 50;
+
+    int inputOutputArrayIterator = 1;
+
     do {
         // Print current guess
         printf("%d\n", currentGuess);
@@ -99,8 +104,29 @@ void run() {
             currentGuess -= additionFactors[additionFactorIterator];
         }
 
+        // Update the input/output array with the current input
+        inputOutputArray[inputOutputArrayIterator] = currentInput;
+
+        // Loop through the input/output array to see if the computer has
+        // already guessed the value it is thinking of. If the computer has
+        // already guessed the value, it will either add or subtract 1 from the
+        // value depending on the users input.
+        for (int i = 0; i <= inputOutputArrayIterator; i += 2) {
+            if (currentGuess == inputOutputArray[i]) {
+                currentGuess = currentGuess + inputOutputArray[i + 1];
+            }
+
+        }
+
         // Update the previous input
         previousInput = currentInput;
+
+        // Add the current guess to the input/output array
+        inputOutputArray[inputOutputArrayIterator + 1] = currentGuess;
+
+        // Move the input/output array iterator to the next open slot in the
+        // array.
+        inputOutputArrayIterator += 2;
     } while (currentInput != 0);
 
 }

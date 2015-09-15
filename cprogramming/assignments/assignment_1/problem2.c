@@ -27,10 +27,16 @@ int main() {
 
     // Initalize addition factors array to pinpoint the user's number
     int additionFactors[4] = {10, 5, 2, 1};
+
+    // Initalize array to hold the user's input and output
     int inputOutputArray[20];
+
+    // Set the first value of the input and output array to 50 because the
+    // computer will always guess the value 50 first
     inputOutputArray[0] = 50;
 
-    int inputOutArrayIterator = 1;
+    // Initalize an int to iterate through the input/output array
+    int inputOutputArrayIterator = 1;
 
 
 
@@ -86,9 +92,14 @@ int main() {
             currentGuess -= additionFactors[additionFactorIterator];
         }
 
-        inputOutputArray[inputOutArrayIterator] = currentInput;
+        // Update the input/output array with the current input
+        inputOutputArray[inputOutputArrayIterator] = currentInput;
 
-        for (int i = 0; i <= inputOutArrayIterator; i += 2) {
+        // Loop through the input/output array to see if the computer has
+        // already guessed the value it is thinking of. If the computer has
+        // already guessed the value, it will either add or subtract 1 from the
+        // value depending on the users input.
+        for (int i = 0; i <= inputOutputArrayIterator; i += 2) {
             if (currentGuess == inputOutputArray[i]) {
                 currentGuess = currentGuess + inputOutputArray[i + 1];
             }
@@ -98,9 +109,12 @@ int main() {
         // Update the previous input
         previousInput = currentInput;
 
-        inputOutputArray[inputOutArrayIterator + 1] = currentGuess;
+        // Add the current guess to the input/output array
+        inputOutputArray[inputOutputArrayIterator + 1] = currentGuess;
 
-        inputOutArrayIterator += 2;
+        // Move the input/output array iterator to the next open slot in the
+        // array.
+        inputOutputArrayIterator += 2;
 
 
     } while (currentInput != 0);
