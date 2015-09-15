@@ -17,8 +17,8 @@
  *that the user will not lie, or choose a number outside of the given bounds.
 */
 
-#include<stdlib.h>
-#include<stdio.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 int main() {
 
@@ -27,8 +27,16 @@ int main() {
 
     // Initalize addition factors array to pinpoint the user's number
     int additionFactors[4] = {10, 5, 2, 1};
+    int inputOutputArray[20];
+    inputOutputArray[0] = 50;
+
+    int inputOutArrayIterator = 1;
+
+
+
 
     do {
+
         // Print current guess
         printf("%d\n", currentGuess);
         // Accept user input
@@ -78,8 +86,23 @@ int main() {
             currentGuess -= additionFactors[additionFactorIterator];
         }
 
+        inputOutputArray[inputOutArrayIterator] = currentInput;
+
+        for (int i = 0; i <= inputOutArrayIterator; i += 2) {
+            if (currentGuess == inputOutputArray[i]) {
+                currentGuess = currentGuess + inputOutputArray[i + 1];
+            }
+
+        }
+
         // Update the previous input
         previousInput = currentInput;
+
+        inputOutputArray[inputOutArrayIterator + 1] = currentGuess;
+
+        inputOutArrayIterator += 2;
+
+
     } while (currentInput != 0);
 
     return 0;

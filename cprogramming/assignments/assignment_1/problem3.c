@@ -24,9 +24,10 @@
 void run();
 
 int main() {
-
+    // Initialize variable
     int choice;
 
+    // Run the function to ask determine user's number
     run();
 
     do {
@@ -103,3 +104,4 @@ void run() {
     } while (currentInput != 0);
 
 }
+
