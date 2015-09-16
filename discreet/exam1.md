@@ -367,3 +367,36 @@ therefore `-(-r or -f)` and De Morgan's laws tells us `(r and f)`
 
 `-(r or -f)` can be written as `(r and f)` which implies `r` must be true.
 Therefore **it rained**.
+
+# 1.7 Proofs
+
+**Proofs**:
+  : A logical argument to proove a certain condition
+
+axioms/postulates:
+  : Must not cause circular reasoning
+
+## Direct Proof
+
+If n is odd, n^2 is odd
+
+`n = 2k + 1` where k is an int
+
+`n^2 = (2k +1)^2 = 4k^2 + 4k + 1 = 2(2k^2 + 2k) + 1`
+
+`n^2 = 2c + 1` (c is a constant).
+
+**n^2 is odd**
+
+## Proof by Contraposition
+
+`p` therefore `p -> q`
+
+`-q`
+
+`-q -> -p` therefore, `p -> q`
+
+## Proof by Contradiction
+
+If the right hand side is false, then the left hand side must also be false
+

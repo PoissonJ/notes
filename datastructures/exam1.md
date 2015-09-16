@@ -334,4 +334,12 @@ one array and use math to determine when a new row begins and ends, but a
 disadvantage of this is that there is one big chunk of memory allocated to
 holding this big array.
 
+A Diagonal Matrix is represented as arrays and they are accessed only when i
+and j are equal. All other values are 0's.
+
+**Sparse Matricies**
+
+ * diagonal
+ * tridiagonal
+ * Lower tiangular
 
