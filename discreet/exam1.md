@@ -400,3 +400,63 @@ If n is odd, n^2 is odd
 
 If the right hand side is false, then the left hand side must also be false
 
+# 1.8 Further proof techniques and approaches
+
+`n is an int`
+
+*Show that n^2 >= n*
+
+ n   result
+ --  ------
+ `+` `+`
+ `0` `0`
+ `-` `-`
+
+For n is positive
+`n >= 1`, multiply both sides by `n` and `n^2 >= n`
+
+For n is negative
+`n^2 !< 0` and `n <= 1` therefore `n <= n^2`
+
+ ******
+
+Without loss of generality:
+  : If we state something a bit more general than it actual is, it can still
+    apply to sub cases of the same argument
+
+There does exist an n such that...
+
+`n s.t. n^2 = 4`
+
+This is known as proof by example or a *constructive* proof
+
+ ******
+
+*Show that x and y are both irrational and exist s.t. x^y is rational.*
+
+`sqrt(2)^2 = 2`
+
+`sqrt(2)^sqrt(2)^sqrt(2) = 2`
+
+`sqrt(2)^sqrt(2)` is the x value and `^sqrt(2)` is the y. This assumption works
+proving that there is at least one case that exists which is enough for the
+proof.
+
+`sqrt(2)^sqrt(2) = ?`, this is the x value
+
+**Since we cannot show the exact x to use, this is known as a *nonconstructive*
+proof.**
+
+
+ ******
+
+
+`oooooo`
+
+`oooooo`
+
+`ooooo.`
+
+Whoever takes the `.` loses the game. You just take 1-3 stones. You cannot
+say for certain that you or your opponent can win. If all that remains on the
+board is the `.`, the next player to  go for sure loses.
