@@ -16,27 +16,63 @@ str5: .asciiz " is not a palindrome number.\n"
 .text
 
 main:
-    la $a0, str1        # Load string address into $s0
-    li $v0, 4           # Load the calue 4 into register $v0 which is for printing a string
-    syscall             # Perform input/output
+    la $a0, str1          # Load string address into $a0
+    li $v0, 4             # Load the value 4 into register $v0 which is for printing a string
+    syscall               # Perform input/output
 
-    la $a0, str2        # Load string address into $s1
-    li $v0, 4           # Load the calue 4 into register $v0 which is for printing a string
-    syscall             # Perform input/output
+    la $a0, str2          # Load string address into $a0
+    li $v0, 4             # Load the value 4 into register $v0 which is for printing a string
+    syscall               # Perform input/output
 
-    la $a0, str3        # Load string address into $s2
-    li $v0, 4           # Load the calue 4 into register $v0 which is for printing a string
-    syscall             # Perform input/output
+    la $a0, str3          # Load string address into $a0
+    li $v0, 4             # Load the value 4 into register $v0 which is for printing a string
+    syscall               # Perform input/output
 
-    li $v0, 5           # Read integer from console
-    syscall             # Perform input/output
+    li $v0, 5             # Read integer from console
+    syscall               # Perform input/output
 
-    move $t0, $v0       # Move user input to register $t0
+    move $t0, $v0         # Move user input to register $t0
 
-    add $t1, $t0, $zero # Create a temp variable that is the same as the user input
+    add $t1, $t0, $zero   # Create a temp variable that is the same as the user input
+
+    li $t3, 10            # Load value of 10 into register t3
+    li $t2, 0             # Load value of 0 into register t2
 
     LOOP:
-    mul $t2
-    bne $t1, $zero, EXIT # if (temp != 0) end loop
+    mul  $t2, $t2, $t3    # reverse = reverse * 10;
+    div  $t1, $t3         # temp / 10
+    mflo $t4              # Move result from temp / 10 into register t4
+    mfhi $t5              # Move remainder from temp / 10 into register t5
+    add  $t2, $t2, $t5    # reverse = reverse + (temp % 10)
+    move $t1, $t4         # Move mflo from temp / 10 into temp
+    beq  $t1, $zero, EXIT # if (temp == 0) end loop
+    j    LOOP
 
     EXIT:
+    beq $t0, $t2, PALINDROME     # if (num == reverse) go to palindrome block
+    bne $t0, $t2, NOTPALINDROME  # if (num != reverse) go to notpalindrome block
+
+    PALINDROME:
+    move $a0, $t0          # Load user input into register for printing
+    li $v0, 1              # Load the value 4 into register $v0 which is for printing a string
+    syscall                # Perform input/output
+
+    la $a0, str4           # Load user input into register for printing
+    li $v0, 4              # Load the value 1 into register $v0 which is for printing an int
+    syscall                # Perform input/output
+
+    li $v0, 10             #exit
+    syscall
+
+    NOTPALINDROME:
+    move $a0, $t0          # Load user input into register for printing
+    li $v0, 1              # Load the value 4 into register $v0 which is for printing an int
+    syscall                # Perform input/output
+
+    la $a0, str5           # Load user input into register for printing
+    li $v0, 4              # Load the value 4 into register $v0 which is for printing a string
+    syscall                # Perform input/output
+
+    li $v0, 10             #exit
+    syscall
+
