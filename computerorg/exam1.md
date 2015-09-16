@@ -303,3 +303,10 @@ Little-endian:
  : Good Design demands good compromises
 
  * Keep formats as similar as possible
+
+# What to know for exam
+
+ * How to convert from assembly language to machine code. Check the chapter 2
+     slides for information on this.
+ * Translate pseudo-instructions into assembly
+ * Binary
