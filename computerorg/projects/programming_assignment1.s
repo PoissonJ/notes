@@ -49,8 +49,8 @@ main:
     j    LOOP
 
     EXIT:
-    beq $t0, $t2, PALINDROME     # if (num == reverse) go to palindrome block
-    bne $t0, $t2, NOTPALINDROME  # if (num != reverse) go to notpalindrome block
+    beq $t0, $t2, PALINDROME     # if (num == reverse) go to PALINDROME block
+    bne $t0, $t2, NOTPALINDROME  # if (num != reverse) go to NOTPALINDROME block
 
     PALINDROME:
     move $a0, $t0          # Load user input into register for printing
@@ -61,7 +61,7 @@ main:
     li $v0, 4              # Load the value 1 into register $v0 which is for printing an int
     syscall                # Perform input/output
 
-    li $v0, 10             #exit
+    li $v0, 10             # Exit
     syscall
 
     NOTPALINDROME:
@@ -73,6 +73,6 @@ main:
     li $v0, 4              # Load the value 4 into register $v0 which is for printing a string
     syscall                # Perform input/output
 
-    li $v0, 10             #exit
+    li $v0, 10             # Exit
     syscall
 
