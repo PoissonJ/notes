@@ -343,3 +343,24 @@ and j are equal. All other values are 0's.
  * tridiagonal
  * Lower tiangular
 
+**Row Lists** would be a good idea if you happen to know that the items are
+spread out uniformly.
+
+**Column Lists** would be a good idea if you happen to know that the items are
+close to the top half of the matric
+
+**Orthogonal Lists** would be a good idea if you happen to what you are looking for
+is in the top left
+
+Thinking about these considerations is what *design* is all about! Sometimes
+you have to pick something even though it has downsides.
+
+## Stacks
+
+Stack:
+  : Essentially a linear list with only additions and removal from the top.
+    Must be FILO to be a stack. This is something is implied with any stack
+    implementation.
+
+PseudoStack:
+  : Stack that you can look at any element, anywhere in the stack
