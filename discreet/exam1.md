@@ -17,7 +17,7 @@ Later on the sort we have to move up to n cards to make space --- n/2 on average
 Choose the middle element and the place the others around to give the cards an
 *approximate* sorted order
 
-For n cards, we apply the overal strategy about log2(n) **base 2** times
+For n cards, we apply the overall strategy about log2(n) **base 2** times
 
 No possible "movement penalty" as the cards are only swapped. n/2 swaps are
 possible in each step
@@ -80,7 +80,7 @@ t:
     T   F
     F   T
 
-The `not` is just the oppisite of p
+The `not` is just the opposite of p
 
 p:
   : The Gators will not win the national title
@@ -95,7 +95,7 @@ q:
 
 u:
   :p->q: if the Gators do not win the national title they will get a new head
-  coach. the `->` means imples. `If p then q`, `If p, q`
+  coach. the `->` means implies. `If p then q`, `If p, q`
 
  p   q   p->q
  ------------
@@ -371,7 +371,7 @@ Therefore **it rained**.
 # 1.7 Proofs
 
 **Proofs**:
-  : A logical argument to proove a certain condition
+  : A logical argument to prove a certain condition
 
 axioms/postulates:
   : Must not cause circular reasoning
@@ -460,3 +460,33 @@ proof.**
 Whoever takes the `.` loses the game. You just take 1-3 stones. You cannot
 say for certain that you or your opponent can win. If all that remains on the
 board is the `.`, the next player to  go for sure loses.
+
+# Chapter 2
+
+# 2.1 Sets
+
+*Sets vs Lists*
+
+ Set                    List
+ ---                    ----
+ Unordered              Ordered
+ No duplicates          Duplicates Allowed
+
+*Set Examples*
+
+ * `S = {0,1,2,3,4,5}`
+
+ * `T = {x: x>0}`
+
+ * `N` (fancy N) refers to the natural numbers `{0,1,2,3,4}
+
+ * *`Z` (fancy Z) refers to all numbers {-2,-1,0,1,2}. You can specify `Z+` to only
+   refer to the positive.*
+
+ * *`R` (fancy R) refers to all the real numbers `{x: x is a real number}`*
+
+ * `Q` (fancy Q) refers to all rationals
+
+ * `C` (fancy C) refers to all complex numbers
+
+
