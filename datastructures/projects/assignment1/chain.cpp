@@ -3,6 +3,7 @@
 #include <iterator>
 #include <sstream>
 #include <stdlib.h>
+#include <vector>
 
 #include "chainNode.cpp"
 #include "illegalIndex.cpp"
@@ -25,7 +26,11 @@ class chain : public linearList<T> {
         void printAll() const;
         void printOne(int index) const;
         void erase(int theIndex);
+        int getSize();
+        void josephusSimulation(vector<int> elementsToInsert, int kthElementRemoved);
+
     protected:
+
         bool checkIndex(int theIndex) const;
         T& get(int theIndex) const;
         chainNode<T>* firstNode;
@@ -53,6 +58,11 @@ chain<T>::~chain() {
         delete firstNode;
         firstNode = nextNode;
     }
+}
+
+template<class T>
+int chain<T>::getSize() {
+    return this->listSize;
 }
 
 template<class T>
@@ -176,6 +186,7 @@ void chain<T>::printAll() const {
     }
     cout << endl;
 }
+
 template<class T>
 void chain<T>::printOne(int index) const {
     bool goodIndex;
@@ -194,4 +205,49 @@ void chain<T>::printOne(int index) const {
             }
         }
     }
+}
+
+template<class T>
+void chain<T>::josephusSimulation(vector<int> elementsToInsert, int kthElementRemoved) {
+
+    chainNode<T>* p = this->firstNode;
+    int tempIndex;
+
+    for (unsigned i = 0; i < elementsToInsert.size(); i++) {
+        cout << "Adding to chain: " << elementsToInsert[i] << endl;
+        this->insert(0, elementsToInsert[i]);
+    }
+
+    if (this->getSize() == 1) {
+        this->printAll();
+    }
+
+    else {
+
+        // Print first element removed from list to avoid issues with the zero
+        // based index of chain compared to the 1 based kthElementRemoved index
+        tempIndex = indexOf(p);
+        this->printOne(tempIndex);
+        cout << " ";
+
+        p = this->get(kthElementRemoved - 1);
+
+        // Erase this special case
+        this->erase(kthElementRemoved - 1);
+
+        while (this->getSize() != 1) {
+
+            for (int i = 0; i < kthElementRemoved; i++) {
+                p = p->next;
+            }
+
+            cout << p->element << " ";
+
+            this->erase(this->indexOf(p));
+
+        }
+    }
+
+
+
 }

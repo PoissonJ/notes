@@ -33,8 +33,6 @@ int main() {
 
             case 'I':
 
-                linestream.clear();
-                linestream.str(line);
                 linestream >> c >> value >> index;
                 nodeChain->insert(index, value);
 
@@ -42,8 +40,6 @@ int main() {
 
             case 'D':
 
-                linestream.clear();
-                linestream.str(line);
                 linestream >> c >> index;
 
                 nodeChain->erase(index);
@@ -56,8 +52,6 @@ int main() {
 
             case 'P':
 
-                linestream.clear();
-                linestream.str(line);
                 linestream >> c >> index;
 
                 nodeChain->printOne(index);
@@ -65,23 +59,19 @@ int main() {
 
             case 'J':
 
-                linestream.clear();
-                linestream.str(line);
                 linestream >> c >> numberOfInsertions >> kthElementRemoved;
 
                 while (linestream >> tempInt) {
-                    cout << tempInt << endl;
+                    //cout << "Adding: " << tempInt << endl;
                     numbersToAddToHead.push_back(tempInt);
                 }
 
-                for (unsigned i = 0; i < numbersToAddToHead.size(); i++) {
-                    cout << numbersToAddToHead[i] << " ";
-                }
+                nodeChain->josephusSimulation(numbersToAddToHead, kthElementRemoved);
 
+                break;
 
         }
     }
-    nodeChain->printAll();
 
     return 0;
 }
