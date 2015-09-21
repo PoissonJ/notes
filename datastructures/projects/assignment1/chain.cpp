@@ -27,12 +27,12 @@ class chain : public linearList<T> {
         void printOne(int index) const;
         void erase(int theIndex);
         int getSize();
-        void josephusSimulation(vector<int> elementsToInsert, int kthElementRemoved);
+        void josephusSimulation(vector<T> elementsToInsert, int kthElementRemoved);
+        T& get(int theIndex) const;
 
     protected:
 
         bool checkIndex(int theIndex) const;
-        T& get(int theIndex) const;
         chainNode<T>* firstNode;
         int indexOf(const T& theElement) const;
 
@@ -76,7 +76,7 @@ bool chain<T>::checkIndex(int theIndex) const {
         return true;
     }
     } catch(invalid_argument& e) {
-        cout << "Out of range error: Check Index" << endl;
+        cout << "Out of range error" << endl;
         return false;
     }
 }
@@ -137,6 +137,18 @@ void chain<T>::erase(int theIndex) {
     }
     listSize--;
     delete deleteNode;
+
+    // Make sure last node points to the first node //
+    chainNode<T>* p = firstNode;
+
+    for (unsigned i = 1; i < listSize; i++) {
+        p = p->next;
+    }
+
+    if (this->firstNode != p->next) {
+        p->next = firstNode;
+    }
+    //////////////////////////////////////////////
 }
 
 template<class T>
@@ -155,7 +167,7 @@ void chain<T>::insert(int theIndex,
 
     if (theIndex == 0) {
         // insert at front
-        firstNode = new chainNode<T>
+        this->firstNode = new chainNode<T>
                     (theElement, firstNode);
     }
     else {
@@ -170,10 +182,22 @@ void chain<T>::insert(int theIndex,
                     (theElement, p->next);
     }
     } catch(invalid_argument& e) {
-        cout << "Out of range error: Insert" << endl;
+        cout << "Out of range error" << endl;
     }
 
     listSize++;
+
+    // Make sure last node points to the first node //
+    chainNode<T>* p = firstNode;
+
+    for (unsigned i = 1; i < listSize; i++) {
+        p = p->next;
+    }
+
+    if (this->firstNode != p->next) {
+        p->next = firstNode;
+    }
+    //////////////////////////////////////////////
 }
 
 template<class T>
@@ -199,7 +223,7 @@ void chain<T>::printOne(int index) const {
         for (int i = 0; i < index + 1; i++) {
 
             if (i == index)  {
-                cout << p->element << endl;
+                cout << p->element;
             } else {
                 p = p->next;
             }
@@ -208,46 +232,32 @@ void chain<T>::printOne(int index) const {
 }
 
 template<class T>
-void chain<T>::josephusSimulation(vector<int> elementsToInsert, int kthElementRemoved) {
+void chain<T>::josephusSimulation(vector<T> elementsToInsert, int kthElementRemoved) {
 
-    chainNode<T>* p = this->firstNode;
-    int tempIndex;
+    int iterator = 1;
 
     for (unsigned i = 0; i < elementsToInsert.size(); i++) {
-        cout << "Adding to chain: " << elementsToInsert[i] << endl;
         this->insert(0, elementsToInsert[i]);
+    }
+
+    chainNode<T>* p = this->firstNode;
+
+    while (this->listSize != 1) {
+
+        while (iterator != kthElementRemoved) {
+            p = p->next;
+            iterator++;
+        }
+
+        printOne(indexOf(p->element));
+        cout << " ";
+        this->erase(indexOf(p->element));
+
+
+        iterator = 0;
     }
 
     if (this->getSize() == 1) {
         this->printAll();
     }
-
-    else {
-
-        // Print first element removed from list to avoid issues with the zero
-        // based index of chain compared to the 1 based kthElementRemoved index
-        tempIndex = indexOf(p);
-        this->printOne(tempIndex);
-        cout << " ";
-
-        p = this->get(kthElementRemoved - 1);
-
-        // Erase this special case
-        this->erase(kthElementRemoved - 1);
-
-        while (this->getSize() != 1) {
-
-            for (int i = 0; i < kthElementRemoved; i++) {
-                p = p->next;
-            }
-
-            cout << p->element << " ";
-
-            this->erase(this->indexOf(p));
-
-        }
-    }
-
-
-
 }

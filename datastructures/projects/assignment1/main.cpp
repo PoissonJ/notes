@@ -12,7 +12,6 @@ int main() {
     string line;
     while( getline( cin, line ) ) {
 
-        vector<int> lineData;
         stringstream linestream;
 
         int value;
@@ -55,6 +54,7 @@ int main() {
                 linestream >> c >> index;
 
                 nodeChain->printOne(index);
+                cout << endl;
                 break;
 
             case 'J':
@@ -67,6 +67,9 @@ int main() {
                 }
 
                 nodeChain->josephusSimulation(numbersToAddToHead, kthElementRemoved);
+                cout << endl;
+
+
 
                 break;
 
