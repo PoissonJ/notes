@@ -65,6 +65,15 @@ int chain<T>::getSize() {
     return this->listSize;
 }
 
+
+/* Checks to see if an index of the chain contains an object. Returns a boolean
+ * if this test is passed or not.
+ *
+ * @param theIndex: The index to check
+ *
+ * @return bool: 'True' is there is an object in the chain at the specified
+ * index
+ */
 template<class T>
 bool chain<T>::checkIndex(int theIndex) const {
     // Verify that theIndex is between 0 and
@@ -81,6 +90,14 @@ bool chain<T>::checkIndex(int theIndex) const {
     }
 }
 
+
+/* Returns an element of an object as a specified index
+ *
+ * @param theIndex: The index of the object in the chain
+ *
+ * @return address of T: Location of the element inside the node in the
+ * specified object in the chain
+ */
 template<class T>
 T& chain<T>::get(int theIndex) const {
     // Return element whose index is theIndex.
@@ -92,6 +109,14 @@ T& chain<T>::get(int theIndex) const {
     return currentNode->element;
 }
 
+
+/* Retrieves the Index of an element contained in a node inside of the chain
+ *
+ * @param theElement: The element contained in the node you we are finding the
+ * index of.
+ *
+ * @return int: Integer of the index with a node containing the inputed element
+ */
 template<class T>
 int chain<T>::indexOf(const T& theElement) const {
     // search the chain for theElement

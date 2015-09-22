@@ -7,9 +7,13 @@
 using namespace std;
 
 int main() {
+
+    // Instantiate new chain object
     chain<int>* nodeChain = new chain<int>();
 
     string line;
+
+    // Read in text file line by line
     while( getline( cin, line ) ) {
 
         stringstream linestream;
@@ -23,15 +27,19 @@ int main() {
         int tempInt;
         vector<int> numbersToAddToHead;
 
-
+        // Clear the linestream
         linestream.clear();
+        // Fill linestream with a blank string
         linestream.str("");
+        // Populate linestring with the current line from file
         linestream << line;
 
         switch(line[0]) {
 
             case 'I':
 
+                // Move the 'I' to the temp character, and the numbers to value
+                // and index
                 linestream >> c >> value >> index;
                 nodeChain->insert(index, value);
 
@@ -62,7 +70,6 @@ int main() {
                 linestream >> c >> numberOfInsertions >> kthElementRemoved;
 
                 while (linestream >> tempInt) {
-                    //cout << "Adding: " << tempInt << endl;
                     numbersToAddToHead.push_back(tempInt);
                 }
 
