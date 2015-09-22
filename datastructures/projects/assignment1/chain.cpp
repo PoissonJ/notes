@@ -139,6 +139,12 @@ int chain<T>::indexOf(const T& theElement) const {
         return index;
 }
 
+/* Erases an element from the chain based on the given index.
+ *
+ * @param int theIndex: The index used to find and delete the item in the chain
+ *
+ * @return void
+ */
 template<class T>
 void chain<T>::erase(int theIndex) {
 
@@ -176,6 +182,14 @@ void chain<T>::erase(int theIndex) {
     //////////////////////////////////////////////
 }
 
+/* Insert an element into the chain an the specified index. A new chainNode
+ * object is created at the time of insertion with the inputed element.
+ *
+ * @param int theIndex: The index in the chain where you want to insert the
+ * item.
+ *
+ * @return void
+ */
 template<class T>
 void chain<T>::insert(int theIndex,
                       const T& theElement) {
@@ -225,6 +239,7 @@ void chain<T>::insert(int theIndex,
     //////////////////////////////////////////////
 }
 
+/* Prints the entire chain */
 template<class T>
 void chain<T>::printAll() const {
     chainNode<T>* p = this->firstNode;
@@ -236,6 +251,12 @@ void chain<T>::printAll() const {
     cout << endl;
 }
 
+/* Prints only the element at the specified valid index.
+ *
+ * @param int index: The index of the item you wish to print
+ *
+ * @return void
+ */
 template<class T>
 void chain<T>::printOne(int index) const {
     bool goodIndex;
@@ -256,6 +277,14 @@ void chain<T>::printOne(int index) const {
     }
 }
 
+/* Simulation of the Josephus problem where every kth element in the list is
+ * removed until there is only one element left in the list.
+ *
+ * @param vector<T> elementsToInsert: A vector of elements for which to create
+ * chain nodes from and insert into the front of the chain
+ *
+ * @return void
+ */
 template<class T>
 void chain<T>::josephusSimulation(vector<T> elementsToInsert, int kthElementRemoved) {
 
