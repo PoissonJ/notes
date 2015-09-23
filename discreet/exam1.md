@@ -400,6 +400,10 @@ If n is odd, n^2 is odd
 
 If the right hand side is false, then the left hand side must also be false
 
+`p`
+
+if `-p -> q` q must be false and -p must be false, showing that p is true.
+
 # 1.8 Further proof techniques and approaches
 
 `n is an int`
