@@ -465,32 +465,3 @@ Whoever takes the `.` loses the game. You just take 1-3 stones. You cannot
 say for certain that you or your opponent can win. If all that remains on the
 board is the `.`, the next player to  go for sure loses.
 
-# Chapter 2
-
-# 2.1 Sets
-
-*Sets vs Lists*
-
- Set                    List
- ---                    ----
- Unordered              Ordered
- No duplicates          Duplicates Allowed
-
-*Set Examples*
-
- * `S = {0,1,2,3,4,5}`
-
- * `T = {x: x>0}`
-
- * `N` (fancy N) refers to the natural numbers `{0,1,2,3,4}
-
- * *`Z` (fancy Z) refers to all numbers {-2,-1,0,1,2}. You can specify `Z+` to only
-   refer to the positive.*
-
- * *`R` (fancy R) refers to all the real numbers `{x: x is a real number}`*
-
- * `Q` (fancy Q) refers to all rationals
-
- * `C` (fancy C) refers to all complex numbers
-
-
