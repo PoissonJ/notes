@@ -36,7 +36,7 @@ is in C. a `C underline` means that A is in C and they might be equlivalent
 
 `|A|` means the magnitude of the set. A.K.A the size. Or *Cardinality*
 
-# 2.2
+# 2.2 Comparing Sets
 
 Venn-diagrams can be used to represent sets.
 
@@ -71,3 +71,36 @@ To capture only B even though A and B intersect... `B-A = {x|x !e A ^ x e B}.
 
  * `A n !B` = -2, 2
  * `!A U B` = all `x e z, z != -2, 2`
+
+# 2.3 Functions
+
+`f(x) = 3x^2 - 5x + 1`
+
+`f: R -> R` this function maps values from the reals to the reals
+
+ ******
+
+One to one function:
+  : For all x and y `x != y -> f(x) != f(y)`
+
+Onto:
+  : For all b in the domain with `f: a -> b`, there exists `f(a) = b` (All
+    right side if covered)
+
+*A function's inverse only exists if there is a one to one and onto*
+
+ ******
+`f: A -> B`
+
+`g: B -> C`
+
+Therefore...
+
+`f o g: A -> C` or `f(g(a)) = C`
+
+ ******
+
+`x e R`
+
+`|-x-|: R -> Z === ceil(x)`
+`|_x_|: R -> Z === floor(x)`
