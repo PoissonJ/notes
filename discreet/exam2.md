@@ -104,3 +104,27 @@ Therefore...
 
 `|-x-|: R -> Z === ceil(x)`
 `|_x_|: R -> Z === floor(x)`
+
+# 2.4 Sequences and Series
+
+Harmonic sequence:
+  : 1, 1/2, 1/3, 1/4....
+
+Geometric sequence:
+  : 1, 2, 4, 8, 16...2^P
+
+Recurrence relation:
+  : {An}, An = An-1 +3
+
+ ******
+
+Series:
+  : Taking the sum of a sequence
+
+
+# 2.5
+
+The reals cannot be mapped 'onto' the integers. The reals is a different
+infinity than the reals.
+
+Real numbers are said to be uncountable, uncountably infinity.
