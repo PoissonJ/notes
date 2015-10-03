@@ -1,3 +1,6 @@
+| Jonathan Poisson
+| 4183-1534
+
 # Problem1
 
 ## A
@@ -29,19 +32,19 @@ P3:
 
 P1:
 
- * Old Exection Time = (10 * 10^9 * 1.6) / (3.2 * 10^9)  = 5
+ * Previous Exection Time = (10 * 10^9 * 1.6) / (3.2 * 10^9)  = 5
  * 5 * .8 = (10 * 10^9 * 1.6 * 1.15) / Clock Rate
  * Clock Rate = 4.6 GHz
 
 P2:
 
- * Old Exection Time = (8 * 10^9 * 1.25) / (2.0 * 10^9)  = 5
+ * Previous Exection Time = (8 * 10^9 * 1.25) / (2.0 * 10^9)  = 5
  * 5 * .8 = (8 * 10^9 * 1.25 * 1.15) / Clock Rate
  * Clock Rate = 2.875 GHz
 
 P3:
 
- * Old Exection Time = (5 * 10^9 * 4) / (4 * 10^9)  = 5
+ * Previous Exection Time = (5 * 10^9 * 4) / (4 * 10^9)  = 5
  * 5 * .8 = (5 * 10^9 * 4 * 1.15) / Clock Rate
  * Clock Rate = 5.75 GHz
 
@@ -121,24 +124,24 @@ f = A[f];
 
 ## A
 
- * sll $t2, $t0, 24  #$t2=AA00 0000
- * or $t2, $t2, $t1  #$t2=BA34 5678
+ * `sll $t2, $t0, 24`  `#$t2=AA00 0000`
+ * `or $t2, $t2, $t1`  `#$t2=BA34 5678`
 
 ## B
 
- * sll $t2, $t0, 4   #$t2=AAAA AAA0
- * andi $t2, $t2, -1 #$t2=AAAA AAA0
+ * `sll $t2, $t0, 4`   `#$t2=AAAA AAA0`
+ * `andi $t2, $t2, -1` `#$t2=AAAA AAA0`
 
 ## C
 
- * srl $t2, $t0, 3  # $t2=1555 5555
- * andi $t2, $t2, 0xFFEF #$t2=0000 5545
+ * `srl $t2, $t0, 3`  `#$t2=1555 5555`
+ * `andi $t2, $t2, 0xFFEF` `#$t2=0000 5545`
 
 # Problem 5
 
 ## A
 
-Runs through the loop 10 times and adds 2 to $s2 each time so $s2 = 20
+Runs through the loop 10 times and adds 2 to `$s2` each time so `$s2` = 20
 
 ## B
 
@@ -153,6 +156,12 @@ while (i > 0) {
 }
 ~~~
 
+## C
+
+The program would execute 4N+2 times if the value of $t1 was N because the loop
+would execute 4 instructions N times and the command to check the loop
+condition consisted of two MIPS instructions.
+
 # Problem 6
 
 ~~~
@@ -165,8 +174,7 @@ jal func            # Call func(a,b)
 move $a0, $v0       # Move result to $a0
 lw $t0, 4($sp)      # Load c
 lw $t1, 8($sp)      # Load d
-add $t2, $t0, $t1   # Add c and d
-move $a1, $t2       # Move c+d into second argument
+add $a1, $t0, $t1   # Add c and d into argumet register
 jal func            # Call func(func(a,b), c+d)
 lw $ra, 0($sp)      # Load return address
 addi $sp, $sp, 12   # Restore stack space
@@ -179,18 +187,25 @@ jr $ra              # Return to caller
  * 121 = 0111 1001
  * 176 = 1 0011 0111
 
-*Overflow*
+**Overflow**
 
 # Problem 8
 
  * 176 = 1011 0000 while ignoring the leading 0
  * -121 = 1000 0111
- * 176 = 1 0011 0111
+ * 176 - 121 = 1010 1001
 
-*Overflow*
+**No Overflow** although 176 cannot be represented in 8-bit 2's complement.
 
 # Problem 9
 
+In binary, 0×0D00 0000 = 0000 1101 0000 0000 0000 0000 0000 0000
+
+= (-1)^0 * (1+0) * 2^(26-127)
+
+= 2^(-101)
+
+= 3.944304526105059027058642826413931148366032175 × 10^-31
 
 # Problem 10
 
