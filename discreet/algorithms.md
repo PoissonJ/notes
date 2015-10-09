@@ -45,3 +45,31 @@ Big-theta:
 | f1(x), f2(x)
 | Each function has its own O(g(x))
 | f1(x) * f2(x) = O( g1(x) * g2(x) )
+
+# 3.2 / 8.3
+
+Review
+
+`f(n) is O(g(n)) if abs(f(n)) <= C abs(g(n))`
+
+A for loop `(for i=0; i< a; i ++)` runs at `O(n)`
+
+ ******
+
+Greedy:
+  : Try to make progress toward the solution in each step
+
+Brute-force algorithm:
+  : Efficency & resources be damned, try everything. After trying all possible
+    solutions, determine the best one. **Try EVERYTHING**. This can sometimes
+    be very inefficent
+
+Different kinds of orders in order of increasing time:
+
+ * O(1): Exact same time for all number of items
+ * O(log n)
+ * O(x^P) for any power greater than 0
+ * O(x!)
+ * O(x^x)
+
+
