@@ -72,4 +72,20 @@ Different kinds of orders in order of increasing time:
  * O(x!)
  * O(x^x)
 
+ ******
 
+## 8.3
+
+Using recursion
+
+ * `T(N)`
+ * `2T(N/2) + O(N^d)`
+
+`T(N) = aT(N/b) + O(N^d log^c(N)`
+
+ * a: subproblems
+ * b: size ratio for sub problems
+ * d: the division step
+ * c: division steps log component growth
+
+**Look at Masters Theorm!**
