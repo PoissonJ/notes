@@ -48,7 +48,7 @@ and B
 
 `A U B`:
   : A union B =  `{x|x e A v x e B}`. Notice the "or" difference here. There
-  could be the case that A and B are not intersecting at all.
+    could be the case that A and B are not intersecting at all.
 
 `Bar over A`:
   : "Everything not in A"
