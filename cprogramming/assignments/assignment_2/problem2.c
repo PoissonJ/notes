@@ -3,6 +3,11 @@
 
 void read_array(int array[], int size) {
   //Implement read_array here
+  int temp = 0;
+  for (int i = 0; i < size; i++) {
+    scanf("%d", &temp);
+    array[i] = temp;
+  }
 }
 
 int main() {
