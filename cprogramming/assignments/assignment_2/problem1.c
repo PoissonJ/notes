@@ -18,12 +18,15 @@ int add(int a, int b) {
 int mul(int a, int b) {
   //Implement mul here
 
+  // Check special cases
   if (a == 1 && b != 1)
       return b;
   if (a != 1 && b == 1)
       return a;
   if (a == 0 || b == 0)
       return 0;
+  /*--End Special Cases--*/
+
   int answer = 0;
   // Need to add together a, b times
   for (int i = 0; i < b; i++) {
@@ -35,12 +38,15 @@ int mul(int a, int b) {
 int power(int a, int b) {
   //Implement power here
 
-  if (a == 0 && b == 0) {
+  // Check special cases
+  if (a == 0 && b == 0)
       return 1;
-  }
-  if (a == 0 && b != 0) {
+  if (a == 0 && b != 0)
       return 0;
-  }
+  if (a != 0 && b == 0)
+      return 1;
+  /*--End Special Cases--*/
+
   else {
   int answer = 1;
   // Multiply a * a, b times
