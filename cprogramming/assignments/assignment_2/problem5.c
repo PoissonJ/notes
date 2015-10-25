@@ -21,18 +21,9 @@ void read_array(int size, int numberOfRuns) {
 
 int main() {
   int size;
-  /*int i;*/
+
   scanf("%d", &size);
   read_array(size, size);
   printf("]\n");
-  /*printf("[");*/
-  /*for(i=0;i<size-1;i++) {*/
-    /*printf("%d,", array[i]);*/
-  /*}*/
-  /*if(size) {*/
-    /*printf("%d", array[size-1]);*/
-  /*}*/
-  /*printf("]\n");*/
-  /*return 0;*/
 }
 
