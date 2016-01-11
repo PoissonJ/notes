@@ -1,4 +1,5 @@
 LIBS=libs/connectivity libs/database libs/manager
+LIBS=$(wildcard libs/*)
 INCLUDE_PATH=libs/
 
 cli_exec: libraries
