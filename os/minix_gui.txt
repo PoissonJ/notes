@@ -1,0 +1,17 @@
+1) After installing MINIX on you PC or VM, Login to the system using your root account.
+
+2) You must check first that your MINIX can connect to internet and fetch data from it (you can do that be checking the ping).
+
+3) Now lets install the packages, to install all MINIX packages that will support you with X-Window System & more features write this in terminal
+
+#pkgin update                           /*This line to update your package list*/
+
+#pkgin in x11                           /*This line to start install all X11 packages*/
+
+4) Now wait until all the packages are installed on your PC or VM.
+
+5) After installation of packages reboot your OS.
+
+6) After booting and login with your root account, write “xdm” in terminal and wait for while until the interface load.
+
+7) To login to the interface use your root account (Username: root – Password: blank)
