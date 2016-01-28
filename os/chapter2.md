@@ -85,3 +85,50 @@ the consumers. Want a Many to Many relationship instead of a one to one.
 
 Eating is the critical section because there are the same number of forks as
 there are plates so each Philosopher cannot eat at the same time.
+
+# Process Scheduling
+
+Used to schedule use of resources in the computer to various processes.
+
+## When to schedule
+
+ - When a process exits
+ - When a process block on I/O, or a semaphore
+ - New process
+ - I/O interrupt
+ - Clock interrupt
+
+## Goals
+
+ - Throughput: maximize the number of jobs per hour
+ - Keeping the CPU busy
+ - Fairness, balance
+ - Fast requests
+
+## Scheduling levels
+
+ - Input
+ - Admission scheduler: decides if the job gets resources
+ - CPU scheduler (Short term): give the CPU to a certain process
+
+## Scheduling Algorithm Measure
+
+Turn-around time = `Finish time - arrival time`. This includes time spent
+waiting for CPU
+
+Mean Turn-around Time:
+ : Averge TT over all jobs
+
+Makespan:
+ : Used for multiprocessor scheduling, it is the finish time for last job to
+   finish - start time for set of jobs. How long does the whole thing take to
+   finish.
+
+Types:
+ - Non-preemptive algs: used for if you have jobs that you know the runtime.
+   The running job must give up the CPU voluntarily.
+ - Shortest job frst (SJF)
+ - FCFS (First come first serve)
+ - Priority
+ - Optimal: Uses knowledge to optimize turnaround time.
+
