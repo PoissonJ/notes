@@ -44,9 +44,13 @@ memory to avoid this.
     set mp_did = 2 * mp_did
 
     do_fork()
-    do_sys_fork()
+    do_srv_fork()
     MODIFY BOTH!
 
 4. modify servers/procfs/pid.c
     buf_printf
     print out mp_did
+
+5. make build && make install && reboot
+
+6. cat /proc/<pid>/psinfo
