@@ -86,6 +86,10 @@ the consumers. Want a Many to Many relationship instead of a one to one.
 Eating is the critical section because there are the same number of forks as
 there are plates so each Philosopher cannot eat at the same time.
 
+# Readers Writers Solution
+
+First come first serve.
+
 # Process Scheduling
 
 Used to schedule use of resources in the computer to various processes.
@@ -124,11 +128,53 @@ Makespan:
    finish - start time for set of jobs. How long does the whole thing take to
    finish.
 
+## Scheduling Algorithms
+
 Types:
  - Non-preemptive algs: used for if you have jobs that you know the runtime.
    The running job must give up the CPU voluntarily.
- - Shortest job frst (SJF)
- - FCFS (First come first serve)
+ - Shortest job frst (SJF) NON PREEMPTIVE
+ - FCFS (First come first serve) NON PREEMPTIVE and most simple
  - Priority
  - Optimal: Uses knowledge to optimize turnaround time.
 
+Round Robin:
+ : Jobs run in the order of arrival and go back to the end of queue when time
+   is up. If a job arrives when the others job runs out, the new job gets the
+   CPU. The time that each job gets depends on the policy you have in place.
+   (Time quantum).
+
+Shortest Remaining Time First:
+ : Ready job that will finish first is the one that gets to run. PREEMPTIVE!
+   Lots of work for the CPU, needs to figure out remaining time for each job.
+
+Preemptive Priority:
+ : If there is a job running at a low priority and a high priority arrives, the
+   higher priority job runs. There can be different time quantums for each
+   priority.
+
+CTSS:
+ : Attempts to approximate SRTF. Enter at queue 0, drops to next queue if time
+   runs out. Each queue has a different quantum. The lowest queue gets priority
+   (0 over 1). Processes move down queue once they run once in a certain queue.
+
+**A context switch is switching between processes. The register values, memory
+map... switches in the CPU.**
+
+*With priority scheduling, we are generally not concerned about turnaround time.*
+
+# Thread Scheduling
+
+Thread is essentially an execution state within a process. Created and
+destroyed easily because they share data that cooresponds to the process they
+are contained in.
+
+User Level Threads:
+ : Simulate a machine in the process. The OS does not know about these threads.
+   If one thread blocks (does I/O) the whole process is blocked by the OS.
+   PROBLEM. Implementing semaphores avoids calling the OS, however.
+
+Kernel Level Threads:
+ : OS knows about them. Fixes the problem with one thread doing I/O as the OS
+   can keep the process running. Kernel knows about the different processors in
+   a multi-processor system which is not achievable in user level threads.
