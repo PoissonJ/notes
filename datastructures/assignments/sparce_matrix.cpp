@@ -1,9 +1,11 @@
 #include <iostream>
+#include <cstring>
+
+using namespace std;
 
 // 0 based (0 = 1 column)
 int globalNumberOfColumns = 0;
 
-using namespace std;
 
 template <class T>
 struct chainNode {
@@ -40,8 +42,7 @@ struct chainNode {
 //chainNode<T>* returnNextIfHasNext
 
 template <class T>
-chainNode<T>* addMatricies(int numberOfRows, chainNode<T>** matrix1, chainNode<T>** matrix2) {
-    chainNode<T>* addedMatricies[numberOfRows];
+void addMatricies(int numberOfRows, chainNode<T>** matrix1, chainNode<T>** matrix2, chainNode<T>** resultMatrix) {
     chainNode<T>* matrix1Node;
     chainNode<T>* matrix2Node;
 
@@ -56,20 +57,25 @@ chainNode<T>* addMatricies(int numberOfRows, chainNode<T>** matrix1, chainNode<T
         matrix1Node = matrix1[i];
         matrix2Node = matrix2[i];
 
+        // Both matricies start at position 0
         if (matrix1Node->position == matrix2Node->position) {
             firstNode = new chainNode<T>(currentPosition, matrix1Node->element + matrix2Node->element, NULL);
             currentPosition++;
             matrix1Node = matrix1Node->returnNextIfHasNext();
             matrix2Node = matrix2Node->returnNextIfHasNext();
         } else {
+            // Matrix 1 has a non 0 number before matrix 2
             if (matrix1Node->position < matrix2Node->position) {
                 firstNode = matrix1Node;
                 currentPosition = matrix1Node->position;
                 currentPosition++;
+                matrix1Node = matrix1Node->returnNextIfHasNext();
             } else {
+            // Matrix 2 has a non 0 number before matrix 1
                 firstNode = matrix2Node;
                 currentPosition = matrix2Node->position;
                 currentPosition++;
+                matrix2Node = matrix2Node->returnNextIfHasNext();
             }
         }
 
@@ -77,6 +83,7 @@ chainNode<T>* addMatricies(int numberOfRows, chainNode<T>** matrix1, chainNode<T
 
         // Traverse Columns
         while (currentPosition <= globalNumberOfColumns) {
+
             if (matrix1Node->position == matrix2Node->position && matrix1Node->position == currentPosition) {
                 tempNode = new chainNode<T>(currentPosition, matrix1Node->element + matrix2Node->element, NULL);
                 currentNode->next = tempNode;
@@ -98,26 +105,48 @@ chainNode<T>* addMatricies(int numberOfRows, chainNode<T>** matrix1, chainNode<T
             currentPosition++;
         }
 
-        addedMatricies[i] = firstNode;
-        cout<<endl<<"First node of row "<<i<<" is "<<addedMatricies[i]->element<<" at position "<<firstNode->position<<endl;
-
+        resultMatrix[i] = firstNode;
     }
-    return *addedMatricies;
+
+    // Reset pointers
+    matrix1Node = matrix1[0];
+    matrix2Node = matrix2[0];
 }
 
-/* CHANGE THIS TO SEARCH AND PRINT! */
-template <class T>
-void printList(chainNode<T> * currentNode) {
-    while (true) {
-        if (currentNode->next != NULL) {
-            cout << currentNode->element << " ";
-            currentNode = currentNode->next;
-        } else {
-            cout << currentNode->element << endl;
-            break;
-        }
-    }
-}
+//template <class T>
+//void searchMatrix(int* searchArray, int length, chainNode<T>** matrix, int rowNum) {
+    //int currentSearch;
+    //chainNode<T>* currentNode;
+    //cout << "Length: "<<length<<endl;
+    //cout << "rowNum: "<<rowNum<<endl;
+
+    //// Traverse search array
+    //for (int i = 0; i < length; i++) {
+        //chainNode<T>* deepCopyMatrix[rowNum];
+        //memcpy(deepCopyMatrix, matrix, sizeof matrix);
+        //cout << "search number index: "<<i<<endl;
+        //currentSearch = searchArray[i];
+
+        //// Traverse matrix
+        //for (int j = 0; i < rowNum; j++) {
+            //currentNode = deepCopyMatrix[j];
+            //cout << matrix[j]<<endl;
+            //cout << deepCopyMatrix[j]<<endl;
+            //cout << "Row number"<<j<<endl;
+            //do {
+                //if (currentNode->element == currentSearch) {
+                    //cout << j << " " << currentNode->position;
+                //}
+                //currentNode = currentNode->returnNextIfHasNext();
+                //cout << "Current Node Element: "<<currentNode->element<< endl;
+                //if (currentNode->next == NULL) {
+                    //cout<<"NULL"<<endl;
+                //}
+            //} while (currentNode->next != NULL);
+        //}
+        //cout << endl;
+    //}
+//}
 
 /* Used for debug purposes */
 template <class T>
@@ -129,7 +158,7 @@ void printMatrix(int numberOfRows, int numberOfColumns, chainNode<T> ** matrix) 
         bool printed;
         cout << endl;
         currentNode = matrix[i];
-        cout <<endl<<"Current node is "<<currentNode->element<<endl;
+        //cout <<endl<<"Current node is "<<currentNode->element<<endl;
 
         while (currentPosition < numberOfColumns) {
             printed = false;
@@ -193,11 +222,13 @@ void buildMatrix(chainNode<T>** matrix, int numberOfRows) {
 
 int main() {
     int numberOfRows;
+    int numberOfSearches;
 
 
     /********* Matrix 1 ****************/
     cin >> numberOfRows;
     chainNode<int>* matrix1[numberOfRows];
+    //chainNode<int>* matrix1Copy = new chainNode<int>[numberOfRows];
     buildMatrix(matrix1, numberOfRows);
     /***********************************/
 
@@ -207,16 +238,63 @@ int main() {
     buildMatrix(matrix2, numberOfRows);
     /***********************************/
 
+    /************DEBUG*****************/
     printMatrix(numberOfRows, 3, matrix1);
     cout << endl;
     printMatrix(numberOfRows, 3, matrix2);
+    cout << endl;
+    /**********************************/
 
+
+    /********* Add Matricies ****************/
     chainNode<int>* addedMatricies[numberOfRows];
-    *addedMatricies = addMatricies(numberOfRows, matrix1, matrix2);
+    addMatricies(numberOfRows, matrix1, matrix2, addedMatricies);
+    /***********************************/
 
-    cout << "Global number of columns: " << globalNumberOfColumns << endl;
+    /************DEBUG*****************/
+    //printMatrix(numberOfRows, 3, addedMatricies);
+    cout << endl;
+    /**********************************/
 
-    printMatrix(numberOfRows, 3, addedMatricies);
+    /********* Handle Searches ****************/
+    cin >> numberOfSearches;
+    int searchNumberArray[numberOfSearches];
+
+    for (int i = 0; i < numberOfSearches; i++) {
+        cin >> searchNumberArray[i];
+    }
+
+
+    //searchMatrix(searchNumberArray, numberOfSearches, addedMatricies, numberOfRows);
+    /***********************************/
+    int currentSearch;
+    chainNode<int>* currentNode;
+
+    // Traverse search array
+    for (int i = 0; i < numberOfSearches; i++) {
+        cout << "search number index: "<<i<<endl;
+        currentSearch = searchNumberArray[i];
+
+        // Traverse matrix
+        cout << numberOfRows << endl;
+        for (int j = 0; j < numberOfRows; j++) {
+            currentNode = addedMatricies[j];
+            cout << "Row number"<<j<<endl;
+            do {
+                if (currentNode->element == currentSearch) {
+                    cout << j << " " << currentNode->position;
+                }
+                cout << "Current Node Element: "<<currentNode->element<< endl;
+                currentNode = currentNode->returnNextIfHasNext();
+                if (currentNode->next == NULL) {
+                    cout<<"NULL"<<endl;
+                }
+            } while (currentNode->next != NULL);
+        }
+        cout << endl;
+    }
+
+
 
     return 0;
 }
