@@ -239,10 +239,10 @@ int main() {
     /***********************************/
 
     /************DEBUG*****************/
-    printMatrix(numberOfRows, 3, matrix1);
-    cout << endl;
-    printMatrix(numberOfRows, 3, matrix2);
-    cout << endl;
+    //printMatrix(numberOfRows, 3, matrix1);
+    //cout << endl;
+    //printMatrix(numberOfRows, 3, matrix2);
+    //cout << endl;
     /**********************************/
 
 
@@ -252,7 +252,7 @@ int main() {
     /***********************************/
 
     /************DEBUG*****************/
-    //printMatrix(numberOfRows, 3, addedMatricies);
+    printMatrix(numberOfRows, 3, addedMatricies);
     cout << endl;
     /**********************************/
 
@@ -272,24 +272,29 @@ int main() {
 
     // Traverse search array
     for (int i = 0; i < numberOfSearches; i++) {
-        cout << "search number index: "<<i<<endl;
+        bool firstElement = true; // Used for printing help
         currentSearch = searchNumberArray[i];
+        cout<<"Checking for: "<<currentSearch<<endl;
 
         // Traverse matrix
-        cout << numberOfRows << endl;
         for (int j = 0; j < numberOfRows; j++) {
             currentNode = addedMatricies[j];
-            cout << "Row number"<<j<<endl;
-            do {
+
+            while (true) {
                 if (currentNode->element == currentSearch) {
-                    cout << j << " " << currentNode->position;
+                    if (firstElement) {
+                        cout << j << " " << currentNode->position;
+                        firstElement = false;
+                    } else { // Not first element so print extra space
+                        cout << " " << j << " " << currentNode->position;
+                    }
                 }
-                cout << "Current Node Element: "<<currentNode->element<< endl;
-                currentNode = currentNode->returnNextIfHasNext();
-                if (currentNode->next == NULL) {
-                    cout<<"NULL"<<endl;
+                if (currentNode->position == globalNumberOfColumns) {
+                    break;
+                } else {
+                    currentNode = currentNode->returnNextIfHasNext();
                 }
-            } while (currentNode->next != NULL);
+            }
         }
         cout << endl;
     }
