@@ -1,3 +1,9 @@
+/**
+ *  Author: Jonathan Poisson
+ *  Email: Poisson.Jonathan777@gmail.com
+ *  Assignment 1 COP3530
+**/
+
 #include <iostream>
 
 using namespace std;
