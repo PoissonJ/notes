@@ -156,7 +156,7 @@ void addMatricies(int numberOfRows, chainNode<T>** matrix1, chainNode<T>** matri
 template <class T>
 void searchMatrix(int* searchArray, int length, chainNode<T>** matrix, int rowNum) {
     int currentSearch;
-    chainNode<int>* currentNode;
+    chainNode<T>* currentNode;
 
     // Traverse search array
     for (int i = 0; i < length; i++) {
@@ -225,7 +225,6 @@ int main() {
     /********* Matrix 1 ****************/
     cin >> numberOfRows;
     chainNode<int>* matrix1[numberOfRows];
-    //chainNode<int>* matrix1Copy = new chainNode<int>[numberOfRows];
     buildMatrix(matrix1, numberOfRows);
     /***********************************/
 
