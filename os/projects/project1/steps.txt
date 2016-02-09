@@ -4,7 +4,7 @@
 2) /usr/src/servers/pm/table.c Using 69 and 70 add system call definition for get and set
 3) in /usr/src/include/minix/callnr.h set new define statements for get and set
    shared value
-4) Add system call funciton prototype in /usr/src/servers/pm/proto.h
+4) Add system call function prototype in /usr/src/servers/pm/proto.h
 5) Implement system calls in /usr/src/servers/pm as a c file.
 6) Add new c files to makefile for compilation
 7) make services && make install && reboot in /usr/src/releasetools
@@ -12,5 +12,8 @@
 
 # User Call
 1) Create function prototype in /usr/src/include/unistd.h (including parameters!)
-2) Implement functions while passing the parameters to the system call through the messaging
+2) Implement functions while passing the parameters to the system call through the messaging in /usr/src/lib/libc/sys-minix/...
 3) Add functions to list in SRCS in /usr/src/lib/libc/sys-minix/Makefile.inc
+
+# Testing
+1) Create function that uses the user library call
