@@ -94,6 +94,8 @@ First come first serve.
 
 Used to schedule use of resources in the computer to various processes.
 
+Nice is used to lower the priority of the current process
+
 ## When to schedule
 
  - When a process exits
@@ -178,3 +180,13 @@ Kernel Level Threads:
  : OS knows about them. Fixes the problem with one thread doing I/O as the OS
    can keep the process running. Kernel knows about the different processors in
    a multi-processor system which is not achievable in user level threads.
+
+# Minix Structure
+
+Polling checks for incoming messages. Messages are sent through either the pm,
+fs, or rs folder first to handle the system call and detect any errors.
+
+Bootstrap program "pulls yourself up by the bootstrap". Checks if the current
+device is bootable and if it is not, move onto the next device.
+
+Software interrupts are called SIGNALS

@@ -22,3 +22,8 @@ Once you have the system calls in place, you can write unit test to check if
 sharred value can be set or gotten.
 
 **usr/src/releasetools to compile**
+
+Code that we changed with a text file explaining what we changed. Also a man
+page for the C library
+
+Passing pointers with m1_p1, ints with m1_i1
