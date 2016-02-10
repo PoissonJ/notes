@@ -226,6 +226,8 @@ void printMatrix(int numberOfRows, int numberOfColumns, chainNode<T> ** matrix) 
 }
 
 int main() {
+    // Speed addition
+    ios::sync_with_stdio(false);
     int numberOfRows;
     int numberOfSearches;
 
