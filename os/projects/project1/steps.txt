@@ -17,3 +17,8 @@
 
 # Testing
 1) Create function that uses the user library call
+
+
+Note:
+The system call will return the status, then user level call can change the
+value of the status
