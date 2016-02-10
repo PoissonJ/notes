@@ -26,6 +26,13 @@
 1) Create function that uses the user library call and the value of status
    after the calls
 
+## Man Page
+
+1) In /usr/src/man/man2 create new entries for get_sv.2 and set_sv.2
+2) After completing man pages explaning what the library function does, add the
+   two new files to the directories Makefile
+3) In /usr/src/man run `make && make install && reboot`
+
 
 Note:
 The system call will return the shared value, then user level call can change the
