@@ -1,0 +1,32 @@
+# List of what was changed
+
+## Building the system call
+
+1) Add `int shared_value` to /usr/src/servers/pm/mproc.h struct definition
+2) Change /usr/src/servers/pm/forkexit.c both function do_fork and do_srv_fork
+   to set initial value to 0
+3) In /usr/src/include/minix/callnr.h set new define statements for get and set
+   shared value
+4) Add system call function prototype in /usr/src/servers/pm/proto.h
+5) Implement system calls in /usr/src/servers/pm as a c file. The system calls
+   use the mp pointer to change or retrieve the current process' shared value.
+   Shared Value is passed from the later implemented user call using messaging.
+6) Add new c files to makefile for compilation
+7) Run make services && make install && reboot in /usr/src/releasetools
+
+## Building the user call
+
+1) Create function prototype in /usr/src/include/unistd.h (including parameters!)
+2) Implement functions while passing the parameters to the system call through the messaging in /usr/src/lib/libc/sys-minix/...
+3) Add functions to list in SRCS in /usr/src/lib/libc/sys-minix/Makefile.inc
+4) Run `cd /usr/src && make build && reboot`
+
+
+## Testing
+1) Create function that uses the user library call and the value of status
+   after the calls
+
+
+Note:
+The system call will return the shared value, then user level call can change the
+value of the status depending on if the value of the shared value is correct
