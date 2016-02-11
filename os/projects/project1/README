@@ -18,22 +18,34 @@
 
 1) Create function prototype in /usr/src/include/unistd.h (including parameters!)
 2) Implement functions while passing the parameters to the system call through
-   the messaging in /usr/src/lib/libc/sys-minix/... The funcitons will set the
-   status of the status pointer and then return the shared value.
+   the messaging in /usr/src/lib/libc/sys-minix/... The functions will set the
+   status of the status pointer based on the success of the system call and
+   then return the shared value. These functions are responsible for calling the
+   implemented system calls.
 3) Add functions to list in SRCS in /usr/src/lib/libc/sys-minix/Makefile.inc
 4) Run `cd /usr/src && make build && reboot`
 
 
-## Testing
-1) Create function that uses the user library call and the value of status
-   after the calls
+## Testing/Test program
+Create function that uses the user library call and the value of status after
+the calls. The status will tell the user if the call was successful. The call
+could have failed if either the shared value was returned as 0 (unchanged), or
+the current process was not found (== null). Set_sv should basically never fail
+because the system call sets the shared_val to the shared_val cooresponding to
+the calling process' ID.
 
 ## Man Page
 
 1) In /usr/src/man/man2 create new entries for get_sv.2 and set_sv.2
-2) After completing man pages explaning what the library function does, add the
+2) After completing man pages explaining what the library function does, add the
    two new files to the directories Makefile
 3) In /usr/src/man run `make && make install && reboot`
+
+## Known bugs
+There could be error if the user wants to set the current process' shared value
+to 0. This is because the user call will return a FAILURE status if the shared
+value is 0 as this is the default shared value. The call assumes that the user
+inputted shared value is not equal to 0.
 
 
 Note:
