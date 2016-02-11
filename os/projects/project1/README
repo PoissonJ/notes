@@ -17,7 +17,9 @@
 ## Building the user call
 
 1) Create function prototype in /usr/src/include/unistd.h (including parameters!)
-2) Implement functions while passing the parameters to the system call through the messaging in /usr/src/lib/libc/sys-minix/...
+2) Implement functions while passing the parameters to the system call through
+   the messaging in /usr/src/lib/libc/sys-minix/... The funcitons will set the
+   status of the status pointer and then return the shared value.
 3) Add functions to list in SRCS in /usr/src/lib/libc/sys-minix/Makefile.inc
 4) Run `cd /usr/src && make build && reboot`
 
