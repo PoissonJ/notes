@@ -26,6 +26,19 @@ index 6f145cf..5abd5e0 100644
  #define TASK_REPLY	121	/* to VFS: reply code from drivers, not
  				 * really a standalone call.
  				 */
+diff --git a/include/minix/sys_config.h b/include/minix/sys_config.h
+index 533046c..2a66d89 100644
+--- a/include/minix/sys_config.h
++++ b/include/minix/sys_config.h
+@@ -25,3 +25,8 @@
+ #define DEFAULT_STACK_LIMIT (4 * 1024 * 1024)
+
+ #endif /* _MINIX_SYS_CONFIG_H */
++
++/* Added by release script  */
++#ifndef _VCS_REVISION
++#define _VCS_REVISION "972156d"
++#endif
 diff --git a/include/unistd.h b/include/unistd.h
 index 55a146b..cf872be 100644
 --- a/include/unistd.h
@@ -122,6 +135,25 @@ index 0000000..d69071c
 +	}
 +}
 +
+diff --git a/lib/libc/ucontextoffsets.h b/lib/libc/ucontextoffsets.h
+new file mode 100644
+index 0000000..7e09221
+--- /dev/null
++++ b/lib/libc/ucontextoffsets.h
+@@ -0,0 +1,13 @@
++#define __ucontext_SIZEOF 608
++#define UC_FLAGS 0
++#define UC_LINK 4
++#define MAGIC 8
++#define DI 20
++#define SI 24
++#define BP 28
++#define AX 48
++#define BX 36
++#define CX 44
++#define DX 40
++#define PC 56
++#define SP 68
 diff --git a/man/man2/Makefile b/man/man2/Makefile
 index 44f54ab..047be90 100644
 --- a/man/man2/Makefile
@@ -135,6 +167,74 @@ index 44f54ab..047be90 100644
 
  MLINKS += select.2 FD_CLR.2
  MLINKS += select.2 FD_ISSET.2
+diff --git a/man/man2/get_sv.2 b/man/man2/get_sv.2
+new file mode 100644
+index 0000000..bfaf926
+--- /dev/null
++++ b/man/man2/get_sv.2
+@@ -0,0 +1,28 @@
++.\" Manpage for get_sv
++.\" Contact Poisson_Jonathan777@gmail.com to correct errors or typos.
++.TH GET_SV 2 "Feb 10, 2016"
++.SH NAME
++get_sv \- get shared value for a process
++.SH SYNOPSIS
++.nf
++.ft B
++#include <sys/types.h>  // Needed for getpid() to get the current process PID
++#include <unistd.h>
++
++int get_sv(int pid, int* status)
++.ft R
++.fi
++.SH DESCRIPTION
++.B get_sv
++returns the value of the shared value variable in the specified process.
++.SH Parameters
++.B int pid:
++the process ID to get the shared value of
++
++.SP
++.B int* status:
++a pointer to an integer representing the status of the call (0 = SUCCESS and 1 = FAILURE)
++.SH RETURNS
++int representing the shared value of the process.
++.SH SEE ALSO
++set_sv(2)
+diff --git a/man/man2/set_sv.2 b/man/man2/set_sv.2
+new file mode 100644
+index 0000000..613c731
+--- /dev/null
++++ b/man/man2/set_sv.2
+@@ -0,0 +1,28 @@
++.\" Manpage for get_sv
++.\" Contact Poisson_Jonathan777@gmail.com to correct errors or typos.
++.TH SET_SV 2 "Feb 10, 2016"
++.SH NAME
++set_sv \- set shared value for a process
++.SH SYNOPSIS
++.nf
++.ft B
++#include <unistd.h>
++
++int set_sv(int newValue, int* status)
++.ft R
++.fi
++.SH DESCRIPTION
++.B set_sv
++returns the value of the shared value variable in the current process.
++.SH Parameters
++.B int newValue:
++the value that will be set at the current process' shared_val
++
++.SP
++.B int* status:
++a pointer to an integer representing the status of the call (0 = SUCCESS and 1 = FAILURE)
++.SH RETURNS
++int representing the shared value of the process.
++.SH SEE ALSO
++get_sv(2)
++
 diff --git a/servers/pm/Makefile b/servers/pm/Makefile
 index 9065432..fc8761f 100644
 --- a/servers/pm/Makefile

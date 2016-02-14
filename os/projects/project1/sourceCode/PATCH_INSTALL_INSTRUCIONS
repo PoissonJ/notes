@@ -1,7 +1,6 @@
 To get the patch to run, I had to do the following
 
 1) cd /usr/src
-1.5) cp get_sc.2 and set_sv.2 to /usr/src/man/man2/
 2) run `git apply --reject --whitespace=fix project1-submission.patch`
 
 As a side note, I did first run
