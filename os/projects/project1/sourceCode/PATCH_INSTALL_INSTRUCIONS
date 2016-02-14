@@ -1,0 +1,9 @@
+To get the patch to run, I had to do the following
+
+1) cd /usr/src
+2) run `git apply --reject --whitespace=fix project1-submission.patch
+
+As a side note, I did first run
+ `git apply --ignore-space-change --ignore-whitespace project1-submission.patch`
+which did not work. I believe it did not make any
+changes to the patch file as well but I just wanted to throw that in there! :)
