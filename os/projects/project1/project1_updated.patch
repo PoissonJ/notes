@@ -5,7 +5,7 @@ index 6f145cf..5abd5e0 100644
 @@ -66,6 +66,15 @@
  #define GETMCONTEXT       67
  #define SETMCONTEXT       68
- 
+
 +/**********************************************/
 +#define PM_GETSHARED    69    /* Project 1 get shared value from process */
 +/**********************************************/
@@ -19,11 +19,11 @@ index 6f145cf..5abd5e0 100644
  #define SIGACTION	  71
  #define SIGSUSPEND	  72
 @@ -109,6 +118,7 @@
- 
+
  #define PM_GETSID	113	/* PM getsid() */
- 
+
 +
- #define TASK_REPLY	121	/* to VFS: reply code from drivers, not 
+ #define TASK_REPLY	121	/* to VFS: reply code from drivers, not
  				 * really a standalone call.
  				 */
 diff --git a/include/minix/sys_config.h b/include/minix/sys_config.h
@@ -32,7 +32,7 @@ index 533046c..2a66d89 100644
 +++ b/include/minix/sys_config.h
 @@ -25,3 +25,8 @@
  #define DEFAULT_STACK_LIMIT (4 * 1024 * 1024)
- 
+
  #endif /* _MINIX_SYS_CONFIG_H */
 +
 +/* Added by release script  */
@@ -46,7 +46,7 @@ index 55a146b..cf872be 100644
 @@ -437,6 +437,12 @@ extern	 int optreset;		/* getopt(3) external variable */
  extern	 char *suboptarg;	/* getsubopt(3) external variable */
  #endif
- 
+
 +/**********************************************/
 +int get_sv(int pid, int* status);
 +/**********************************************/
@@ -54,7 +54,7 @@ index 55a146b..cf872be 100644
 +int set_sv(int newVal, int* status);
 +/**********************************************/
  __END_DECLS
- 
+
  #ifdef __minix
 diff --git a/lib/libc/sys-minix/Makefile.inc b/lib/libc/sys-minix/Makefile.inc
 index 6f52097..ea9dc40 100644
@@ -67,7 +67,7 @@ index 6f52097..ea9dc40 100644
 -	_exit.c _ucontext.c environ.c __getcwd.c vfork.c sizeup.c init.c
 +	_exit.c _ucontext.c environ.c __getcwd.c vfork.c sizeup.c init.c \
 +	get_sv.c set_sv.c
- 
+
  # Minix specific syscalls.
  SRCS+= cprofile.c lseek64.c sprofile.c _mcontext.c
 diff --git a/lib/libc/sys-minix/get_sv.c b/lib/libc/sys-minix/get_sv.c
@@ -164,7 +164,7 @@ index 44f54ab..047be90 100644
  	statvfs.2 svrctl.2 symlink.2 sync.2 time.2 times.2 truncate.2 \
 -	umask.2 uname.2 unlink.2 utime.2 wait.2 write.2
 +	umask.2 uname.2 unlink.2 utime.2 wait.2 write.2 get_sv.2 set_sv.2
- 
+
  MLINKS += select.2 FD_CLR.2
  MLINKS += select.2 FD_ISSET.2
 diff --git a/man/man2/get_sv.2 b/man/man2/get_sv.2
@@ -245,7 +245,7 @@ index 9065432..fc8761f 100644
  	signal.c utility.c table.c getset.c misc.c \
 -	profile.c schedule.c
 +	profile.c schedule.c get_sv.c set_sv.c
- 
+
  .if ${USE_MCONTEXT} != "no"
  SRCS+= mcontext.c
 diff --git a/servers/pm/forkexit.c b/servers/pm/forkexit.c
@@ -263,11 +263,11 @@ index 6e01f41..b0106d7 100644
 +
    for (i = 0; i < NR_ITIMERS; i++)
  	rmc->mp_interval[i] = 0;	/* reset timer intervals */
- 
+
 @@ -206,6 +211,11 @@ int do_srv_fork()
    new_pid = get_free_pid();
    rmc->mp_pid = new_pid;	/* assign pid to child */
- 
+
 +  /********************************************/
 +  rmc->shared_val = 0;     /* Project 1 set shared value to 0 initally */
 +  /********************************************/
@@ -292,7 +292,7 @@ index 0000000..a10c0bb
 +
 +	register struct mproc* current_process;
 +	current_process = find_proc(process_id);
-+	
++
 +	if (current_process != NULL) {
 +		return current_process->shared_val;
 +	} else {
@@ -306,7 +306,7 @@ index 80afb4e..07823eb 100644
 +++ b/servers/pm/mproc.h
 @@ -70,6 +70,13 @@ EXTERN struct mproc {
    char mp_name[PROC_NAME_LEN];	/* process name */
- 
+
    int mp_magic;			/* sanity check, MP_MAGIC */
 +
 +
@@ -316,7 +316,7 @@ index 80afb4e..07823eb 100644
 +
 +
  } mproc[NR_PROCS];
- 
+
  /* Flag values */
 diff --git a/servers/pm/proto.h b/servers/pm/proto.h
 index 00646d3..d42bdfb 100644
@@ -333,7 +333,7 @@ index 00646d3..d42bdfb 100644
 +/**********************************/
 +int set_sv_system(void); /* Project 1. Parameters are passed using messages*/
 +/**********************************/
- 
+
  /* schedule.c */
  void sched_init(void);
 diff --git a/servers/pm/set_sv.c b/servers/pm/set_sv.c
@@ -351,7 +351,7 @@ index 0000000..60d065a
 +	register struct mproc* current_process;
 +	current_process = mp;
 +
-+	int process_id = current_process->mp_pid; 
++	int process_id = current_process->mp_pid;
 +	int newVal = m_in.m1_i1;
 +
 +	current_process->shared_val = newVal;
