@@ -1,0 +1,395 @@
+diff --git a/include/minix/callnr.h b/include/minix/callnr.h
+index 6f145cf..5abd5e0 100644
+--- a/include/minix/callnr.h
++++ b/include/minix/callnr.h
+@@ -66,6 +66,15 @@
+ #define GETMCONTEXT       67
+ #define SETMCONTEXT       68
+ 
++/**********************************************/
++#define PM_GETSHARED    69    /* Project 1 get shared value from process */
++/**********************************************/
++
++/**********************************************/
++#define PM_SETSHARED    70    /* Project 1 set shared value from process */
++/**********************************************/
++
++
+ /* Posix signal handling. */
+ #define SIGACTION	  71
+ #define SIGSUSPEND	  72
+@@ -109,6 +118,7 @@
+ 
+ #define PM_GETSID	113	/* PM getsid() */
+ 
++
+ #define TASK_REPLY	121	/* to VFS: reply code from drivers, not 
+ 				 * really a standalone call.
+ 				 */
+diff --git a/include/minix/sys_config.h b/include/minix/sys_config.h
+index 533046c..2a66d89 100644
+--- a/include/minix/sys_config.h
++++ b/include/minix/sys_config.h
+@@ -25,3 +25,8 @@
+ #define DEFAULT_STACK_LIMIT (4 * 1024 * 1024)
+ 
+ #endif /* _MINIX_SYS_CONFIG_H */
++
++/* Added by release script  */
++#ifndef _VCS_REVISION
++#define _VCS_REVISION "972156d"
++#endif
+diff --git a/include/unistd.h b/include/unistd.h
+index 55a146b..cf872be 100644
+--- a/include/unistd.h
++++ b/include/unistd.h
+@@ -437,6 +437,12 @@ extern	 int optreset;		/* getopt(3) external variable */
+ extern	 char *suboptarg;	/* getsubopt(3) external variable */
+ #endif
+ 
++/**********************************************/
++int get_sv(int pid, int* status);
++/**********************************************/
++/**********************************************/
++int set_sv(int newVal, int* status);
++/**********************************************/
+ __END_DECLS
+ 
+ #ifdef __minix
+diff --git a/lib/libc/sys-minix/Makefile.inc b/lib/libc/sys-minix/Makefile.inc
+index 6f52097..ea9dc40 100644
+--- a/lib/libc/sys-minix/Makefile.inc
++++ b/lib/libc/sys-minix/Makefile.inc
+@@ -16,7 +16,8 @@ SRCS+= 	accept.c access.c bind.c brk.c sbrk.c m_closefrom.c getsid.c \
+ 	vectorio.c shutdown.c sigaction.c sigpending.c sigreturn.c sigsuspend.c\
+ 	sigprocmask.c socket.c socketpair.c stat.c statvfs.c symlink.c \
+ 	sync.c syscall.c sysuname.c truncate.c umask.c unlink.c write.c \
+-	_exit.c _ucontext.c environ.c __getcwd.c vfork.c sizeup.c init.c
++	_exit.c _ucontext.c environ.c __getcwd.c vfork.c sizeup.c init.c \
++	get_sv.c set_sv.c
+ 
+ # Minix specific syscalls.
+ SRCS+= cprofile.c lseek64.c sprofile.c _mcontext.c
+diff --git a/lib/libc/sys-minix/get_sv.c b/lib/libc/sys-minix/get_sv.c
+new file mode 100644
+index 0000000..2c5cd9e
+--- /dev/null
++++ b/lib/libc/sys-minix/get_sv.c
+@@ -0,0 +1,17 @@
++#include <lib.h>    // Provides _syscall and message
++#include <unistd.h> // Provides function prototype
++
++int get_sv(int pid, int* status) {
++	message m;
++
++	m.m1_i1 = pid;
++
++	int shared_value =  _syscall(PM_PROC_NR, PM_GETSHARED, &m);
++	if (shared_value != 0 ) {
++		*status = 0;
++		return shared_value;
++	} else {
++		*status = 1;
++		return shared_value;
++	}
++}
+diff --git a/lib/libc/sys-minix/printmsg.c b/lib/libc/sys-minix/printmsg.c
+new file mode 100644
+index 0000000..db1c342
+--- /dev/null
++++ b/lib/libc/sys-minix/printmsg.c
+@@ -0,0 +1,10 @@
++#include <lib.h>
++#include <unistd.h>
++
++int printmsg(int val) {
++	message m;
++
++	m.m1_i1 = val;
++
++	return _syscall(PM_PROC_NR, PRINTMSG, &m);
++}
+diff --git a/lib/libc/sys-minix/set_sv.c b/lib/libc/sys-minix/set_sv.c
+new file mode 100644
+index 0000000..d69071c
+--- /dev/null
++++ b/lib/libc/sys-minix/set_sv.c
+@@ -0,0 +1,20 @@
++#include <lib.h>    // Provides _syscall and message
++#include <unistd.h> // Provides function prototype
++#include <stdio.h>
++
++int set_sv(int newVal, int* status) {
++	message m;
++
++	m.m1_i1 = newVal;
++
++	int shared_value = _syscall(PM_PROC_NR, PM_SETSHARED, &m);
++	if (shared_value == newVal) {
++		*status = 0;
++		return shared_value;
++	}
++	else {
++		*status = 1;
++		return 0;
++	}
++}
++
+diff --git a/lib/libc/ucontextoffsets.h b/lib/libc/ucontextoffsets.h
+new file mode 100644
+index 0000000..7e09221
+--- /dev/null
++++ b/lib/libc/ucontextoffsets.h
+@@ -0,0 +1,13 @@
++#define __ucontext_SIZEOF 608
++#define UC_FLAGS 0
++#define UC_LINK 4
++#define MAGIC 8
++#define DI 20
++#define SI 24
++#define BP 28
++#define AX 48
++#define BX 36
++#define CX 44
++#define DX 40
++#define PC 56
++#define SP 68
+diff --git a/man/man2/Makefile b/man/man2/Makefile
+index 44f54ab..047be90 100644
+--- a/man/man2/Makefile
++++ b/man/man2/Makefile
+@@ -9,7 +9,7 @@ MAN=	accept.2 access.2 alarm.2 bind.2 brk.2 chdir.2 chmod.2 chown.2 \
+ 	setsockopt.2 setuid.2 shutdown.2 sigaction.2 sigpending.2 \
+ 	sigprocmask.2 sigsuspend.2 socket.2 socketpair.2 \
+ 	statvfs.2 svrctl.2 symlink.2 sync.2 time.2 times.2 truncate.2 \
+-	umask.2 uname.2 unlink.2 utime.2 wait.2 write.2
++	umask.2 uname.2 unlink.2 utime.2 wait.2 write.2 get_sv.2 set_sv.2
+ 
+ MLINKS += select.2 FD_CLR.2
+ MLINKS += select.2 FD_ISSET.2
+diff --git a/man/man2/get_sv.2 b/man/man2/get_sv.2
+new file mode 100644
+index 0000000..bfaf926
+--- /dev/null
++++ b/man/man2/get_sv.2
+@@ -0,0 +1,28 @@
++.\" Manpage for get_sv
++.\" Contact Poisson_Jonathan777@gmail.com to correct errors or typos.
++.TH GET_SV 2 "Feb 10, 2016"
++.SH NAME
++get_sv \- get shared value for a process
++.SH SYNOPSIS
++.nf
++.ft B
++#include <sys/types.h>  // Needed for getpid() to get the current process PID
++#include <unistd.h>
++
++int get_sv(int pid, int* status)
++.ft R
++.fi
++.SH DESCRIPTION
++.B get_sv
++returns the value of the shared value variable in the specified process.
++.SH Parameters
++.B int pid:
++the process ID to get the shared value of
++
++.SP
++.B int* status:
++a pointer to an integer representing the status of the call (0 = SUCCESS and 1 = FAILURE)
++.SH RETURNS
++int representing the shared value of the process.
++.SH SEE ALSO
++set_sv(2)
+diff --git a/man/man2/set_sv.2 b/man/man2/set_sv.2
+new file mode 100644
+index 0000000..613c731
+--- /dev/null
++++ b/man/man2/set_sv.2
+@@ -0,0 +1,28 @@
++.\" Manpage for get_sv
++.\" Contact Poisson_Jonathan777@gmail.com to correct errors or typos.
++.TH SET_SV 2 "Feb 10, 2016"
++.SH NAME
++set_sv \- set shared value for a process
++.SH SYNOPSIS
++.nf
++.ft B
++#include <unistd.h>
++
++int set_sv(int newValue, int* status)
++.ft R
++.fi
++.SH DESCRIPTION
++.B set_sv
++returns the value of the shared value variable in the current process.
++.SH Parameters
++.B int newValue:
++the value that will be set at the current process' shared_val
++
++.SP
++.B int* status:
++a pointer to an integer representing the status of the call (0 = SUCCESS and 1 = FAILURE)
++.SH RETURNS
++int representing the shared value of the process.
++.SH SEE ALSO
++get_sv(2)
++
+diff --git a/servers/pm/Makefile b/servers/pm/Makefile
+index 9065432..fc8761f 100644
+--- a/servers/pm/Makefile
++++ b/servers/pm/Makefile
+@@ -4,7 +4,7 @@
+ PROG=	pm
+ SRCS=	main.c forkexit.c break.c exec.c time.c alarm.c \
+ 	signal.c utility.c table.c getset.c misc.c \
+-	profile.c schedule.c
++	profile.c schedule.c get_sv.c set_sv.c
+ 
+ .if ${USE_MCONTEXT} != "no"
+ SRCS+= mcontext.c
+diff --git a/servers/pm/forkexit.c b/servers/pm/forkexit.c
+index 6e01f41..b0106d7 100644
+--- a/servers/pm/forkexit.c
++++ b/servers/pm/forkexit.c
+@@ -106,6 +106,11 @@ int do_fork()
+   rmc->mp_exitstatus = 0;
+   rmc->mp_sigstatus = 0;
+   rmc->mp_endpoint = child_ep;		/* passed back by VM */
++
++  /********************************************/
++  rmc->shared_val = 0;     /* Project 1 set shared value to 0 initally */
++  /********************************************/
++
+   for (i = 0; i < NR_ITIMERS; i++)
+ 	rmc->mp_interval[i] = 0;	/* reset timer intervals */
+ 
+@@ -206,6 +211,11 @@ int do_srv_fork()
+   new_pid = get_free_pid();
+   rmc->mp_pid = new_pid;	/* assign pid to child */
+ 
++  /********************************************/
++  rmc->shared_val = 0;     /* Project 1 set shared value to 0 initally */
++  /********************************************/
++
++
+   m.m_type = PM_SRV_FORK;
+   m.PM_PROC = rmc->mp_endpoint;
+   m.PM_PPROC = rmp->mp_endpoint;
+diff --git a/servers/pm/get_sv.c b/servers/pm/get_sv.c
+new file mode 100644
+index 0000000..a10c0bb
+--- /dev/null
++++ b/servers/pm/get_sv.c
+@@ -0,0 +1,18 @@
++#include <stdio.h>
++#include "pm.h"  // provides global variables such as m_in
++#include "mproc.h"
++
++/* Returns current process' shared_val if process exists */
++int get_sv_system() {
++	int process_id = m_in.m1_i1;
++
++	register struct mproc* current_process;
++	current_process = find_proc(process_id);
++	
++	if (current_process != NULL) {
++		return current_process->shared_val;
++	} else {
++		printf("ERROR: Process not found\n");
++		return 0;
++	}
++}
+diff --git a/servers/pm/mproc.h b/servers/pm/mproc.h
+index 80afb4e..07823eb 100644
+--- a/servers/pm/mproc.h
++++ b/servers/pm/mproc.h
+@@ -70,6 +70,13 @@ EXTERN struct mproc {
+   char mp_name[PROC_NAME_LEN];	/* process name */
+ 
+   int mp_magic;			/* sanity check, MP_MAGIC */
++
++
++  /***********************************/
++  int shared_val;               /* Project 1 value */
++  /***********************************/
++
++
+ } mproc[NR_PROCS];
+ 
+ /* Flag values */
+diff --git a/servers/pm/proto.h b/servers/pm/proto.h
+index 00646d3..d42bdfb 100644
+--- a/servers/pm/proto.h
++++ b/servers/pm/proto.h
+@@ -56,6 +56,13 @@ int do_getepinfo(void);
+ int do_getepinfo_o(void);
+ int do_svrctl(void);
+ int do_getsetpriority(void);
++/**********************************/
++int get_sv_system(void); /* Project 1. Parameters are passed using messages */
++/**********************************/
++
++/**********************************/
++int set_sv_system(void); /* Project 1. Parameters are passed using messages*/
++/**********************************/
+ 
+ /* schedule.c */
+ void sched_init(void);
+diff --git a/servers/pm/set_sv.c b/servers/pm/set_sv.c
+new file mode 100644
+index 0000000..60d065a
+--- /dev/null
++++ b/servers/pm/set_sv.c
+@@ -0,0 +1,21 @@
++#include <stdio.h>
++#include "pm.h"  // provides global variables such as m_in
++#include "mproc.h"
++
++/* Returns current process' shared_val if process exists */
++int set_sv_system() {
++	register struct mproc* current_process;
++	current_process = mp;
++
++	int process_id = current_process->mp_pid; 
++	int newVal = m_in.m1_i1;
++
++	current_process->shared_val = newVal;
++	if (current_process->shared_val == newVal) {
++		return current_process->shared_val;
++	} else {
++		printf("ERROR: Value not set\n");
++		return 0;
++	}
++}
++
+diff --git a/servers/pm/table.c b/servers/pm/table.c
+index 5051cec..b87bc92 100644
+--- a/servers/pm/table.c
++++ b/servers/pm/table.c
+@@ -80,8 +80,12 @@ int (*call_vec[])(void) = {
+ 	do_set, 	/* 66 = setgroups */
+ 	do_getmcontext,	/* 67 = getmcontext */
+ 	do_setmcontext,	/* 68 = setmcontext */
+-	no_sys,		/* 69 = unused	*/
+-	no_sys,		/* 70 = unused	*/
++	/**************************************/
++	get_sv_system,	 	/* 69 = get_sv */
++	/**************************************/
++	/**************************************/
++	set_sv_system,		/* 70 = set_sev */
++	/**************************************/
+ 	do_sigaction,	/* 71 = sigaction   */
+ 	do_sigsuspend,	/* 72 = sigsuspend  */
+ 	do_sigpending,	/* 73 = sigpending  */
+@@ -94,8 +98,8 @@ int (*call_vec[])(void) = {
+ 	no_sys,		/* 80 = (getdents) */
+ 	no_sys, 	/* 81 = unused */
+ 	no_sys, 	/* 82 = (fstatfs) */
+-	no_sys, 	/* 83 = unused */
+-	no_sys, 	/* 84 = unused */
++	no_sys, 	/* 83 = unused*/
++	no_sys, 	/* 84 = unused*/
+ 	no_sys,		/* 85 = (select) */
+ 	no_sys,		/* 86 = (fchdir) */
+ 	no_sys,		/* 87 = (fsync) */
