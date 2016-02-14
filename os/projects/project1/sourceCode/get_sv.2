@@ -1,0 +1,28 @@
+.\" Manpage for get_sv
+.\" Contact Poisson_Jonathan777@gmail.com to correct errors or typos.
+.TH GET_SV 2 "Feb 10, 2016"
+.SH NAME
+get_sv \- get shared value for a process
+.SH SYNOPSIS
+.nf
+.ft B
+#include <sys/types.h>  // Needed for getpid() to get the current process PID
+#include <unistd.h>
+
+int get_sv(int pid, int* status)
+.ft R
+.fi
+.SH DESCRIPTION
+.B get_sv
+returns the value of the shared value variable in the specified process.
+.SH Parameters
+.B int pid:
+the process ID to get the shared value of
+
+.SP
+.B int* status:
+a pointer to an integer representing the status of the call (0 = SUCCESS and 1 = FAILURE)
+.SH RETURNS
+int representing the shared value of the process.
+.SH SEE ALSO
+set_sv(2)
