@@ -26,19 +26,6 @@ index 6f145cf..5abd5e0 100644
  #define TASK_REPLY	121	/* to VFS: reply code from drivers, not 
  				 * really a standalone call.
  				 */
-diff --git a/include/minix/sys_config.h b/include/minix/sys_config.h
-index 533046c..2a66d89 100644
---- a/include/minix/sys_config.h
-+++ b/include/minix/sys_config.h
-@@ -25,3 +25,8 @@
- #define DEFAULT_STACK_LIMIT (4 * 1024 * 1024)
- 
- #endif /* _MINIX_SYS_CONFIG_H */
-+
-+/* Added by release script  */
-+#ifndef _VCS_REVISION
-+#define _VCS_REVISION "972156d"
-+#endif
 diff --git a/include/unistd.h b/include/unistd.h
 index 55a146b..cf872be 100644
 --- a/include/unistd.h
@@ -135,25 +122,6 @@ index 0000000..d69071c
 +	}
 +}
 +
-diff --git a/lib/libc/ucontextoffsets.h b/lib/libc/ucontextoffsets.h
-new file mode 100644
-index 0000000..7e09221
---- /dev/null
-+++ b/lib/libc/ucontextoffsets.h
-@@ -0,0 +1,13 @@
-+#define __ucontext_SIZEOF 608
-+#define UC_FLAGS 0
-+#define UC_LINK 4
-+#define MAGIC 8
-+#define DI 20
-+#define SI 24
-+#define BP 28
-+#define AX 48
-+#define BX 36
-+#define CX 44
-+#define DX 40
-+#define PC 56
-+#define SP 68
 diff --git a/man/man2/Makefile b/man/man2/Makefile
 index 44f54ab..047be90 100644
 --- a/man/man2/Makefile
