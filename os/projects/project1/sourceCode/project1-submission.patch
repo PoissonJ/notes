@@ -75,7 +75,7 @@ new file mode 100644
 index 0000000..2c5cd9e
 --- /dev/null
 +++ b/lib/libc/sys-minix/get_sv.c
-@@ -0,0 +1,17 @@
+@@ -0,0 +1,18 @@
 +#include <lib.h>    // Provides _syscall and message
 +#include <unistd.h> // Provides function prototype
 +
