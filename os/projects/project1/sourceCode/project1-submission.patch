@@ -84,13 +84,13 @@ index 0000000..2c5cd9e
 +
 +	m.m1_i1 = pid;
 +
-+	int shared_value =  _syscall(PM_PROC_NR, PM_GETSHARED, &m);
++	_value =  _syscall(PM_PROC_NR, PM_GETSHARED, &m);
 +	if (shared_value != 0 ) {
 +		*status = 0;
-+		return shared_value;
++		return m.m1_i1;
 +	} else {
 +		*status = 1;
-+		return shared_value;
++		return 0;
 +	}
 +}
 diff --git a/lib/libc/sys-minix/printmsg.c b/lib/libc/sys-minix/printmsg.c
@@ -124,10 +124,10 @@ index 0000000..d69071c
 +
 +	m.m1_i1 = newVal;
 +
-+	int shared_value = _syscall(PM_PROC_NR, PM_SETSHARED, &m);
++	_value = _syscall(PM_PROC_NR, PM_SETSHARED, &m);
 +	if (shared_value == newVal) {
 +		*status = 0;
-+		return shared_value;
++		return m.m1_i1;
 +	}
 +	else {
 +		*status = 1;
@@ -294,7 +294,7 @@ index 0000000..a10c0bb
 +	current_process = find_proc(process_id);
 +
 +	if (current_process != NULL) {
-+		return current_process->shared_val;
++		mp->mp_reply.m1_i1 = current_process->shared_val;
 +	} else {
 +		printf("ERROR: Process not found\n");
 +		return 0;
@@ -356,7 +356,7 @@ index 0000000..60d065a
 +
 +	current_process->shared_val = newVal;
 +	if (current_process->shared_val == newVal) {
-+		return current_process->shared_val;
++		mp->mp_reply.m1_i1 = newVal;
 +	} else {
 +		printf("ERROR: Value not set\n");
 +		return 0;
