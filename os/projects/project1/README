@@ -47,9 +47,8 @@ to 0. This is because the user call will return a FAILURE status if the shared
 value is 0 as this is the default shared value. The call assumes that the user
 inputted shared value is not equal to 0.
 
-Also, when setting sharred value to negative numbers, the test programs crash
-
 
 Note:
-The system call will return the shared value, then user level call can change the
-value of the status depending on if the value of the shared value is correct
+The system call will chane the message contanint the shared value, then user
+level call can change the value of the status depending on if the value of the
+shared value is correct.
