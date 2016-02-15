@@ -85,6 +85,7 @@ index 0000000..2c5cd9e
 +	m.m1_i1 = pid;
 +
 +	_syscall(PM_PROC_NR, PM_GETSHARED, &m);
++       int shared_value = m.m1_i1;
 +	if (shared_value != 0 ) {
 +		*status = 0;
 +		return m.m1_i1;
@@ -125,6 +126,7 @@ index 0000000..d69071c
 +	m.m1_i1 = newVal;
 +
 +	_syscall(PM_PROC_NR, PM_SETSHARED, &m);
++       int shared_value = m.m1_i1;
 +	if (shared_value == newVal) {
 +		*status = 0;
 +		return m.m1_i1;
