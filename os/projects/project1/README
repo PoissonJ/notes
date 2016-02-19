@@ -49,6 +49,6 @@ inputted shared value is not equal to 0.
 
 
 Note:
-The system call will chane the message contanint the shared value, then user
+The system call will change the message contaning the shared value, then user
 level call can change the value of the status depending on if the value of the
 shared value is correct.
