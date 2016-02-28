@@ -126,6 +126,7 @@ double postfixSolve(queue<T> inputQueue) {
                 double temp = number1 * number2;
                 solutionStack.push(temp);
             } else if (currentElement == "/") {
+                if (number2 == 0) goto ERROR;
                 double temp = number1 / number2;
                 solutionStack.push(temp);
             } else if (currentElement == "+") {
@@ -139,6 +140,10 @@ double postfixSolve(queue<T> inputQueue) {
         inputQueue.pop();
     }
     return solutionStack.top();
+
+    ERROR:
+        cout << "Division-By-Zero" << endl;
+        return (double)NULL;
 }
 
 
@@ -155,6 +160,8 @@ int main() {
 
     // Calculate
     answer = postfixSolve(postfixQueue);
-    cout << "Answer: " << answer << endl;
+    if (answer) {
+        cout << "Answer: " << answer << endl;
+    }
     return 0;
 }
