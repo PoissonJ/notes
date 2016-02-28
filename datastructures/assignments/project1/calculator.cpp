@@ -39,6 +39,7 @@ void inputBuilder(queue<T>& inputQueue) {
 
     while (cin.peek() != '\n') {
         cin >> temp;
+        if (temp == "quit") exit(1);
         inputQueue.push(temp);
     }
 }
@@ -143,7 +144,7 @@ double postfixSolve(queue<T> inputQueue) {
 
     ERROR:
         cout << "Division-By-Zero" << endl;
-        return (double)NULL;
+        return (double)NULL; // <- Lol wut? Go c++!
 }
 
 
@@ -152,16 +153,19 @@ int main() {
     queue<string> postfixQueue;
     double answer;
 
-    // Input
-    inputBuilder(inputQueue);
+    while (1) {
+        // Input
+        inputBuilder(inputQueue);
 
-    // Shunting yard
-    postfixBuilder(inputQueue, postfixQueue);
+        // Shunting yard
+        postfixBuilder(inputQueue, postfixQueue);
 
-    // Calculate
-    answer = postfixSolve(postfixQueue);
-    if (answer) {
-        cout << "Answer: " << answer << endl;
+        // Calculate
+        answer = postfixSolve(postfixQueue);
+        if (answer) {
+            cout << "Answer: " << answer << endl;
+        }
+        cin.ignore();
     }
     return 0;
 }
