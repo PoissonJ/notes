@@ -104,35 +104,35 @@ void printQueue(queue<T>& inputQueue) {
 }
 
 template <class T>
-int postfixSolve(queue<T> inputQueue) {
-    stack<int> solutionStack;
+double postfixSolve(queue<T> inputQueue) {
+    stack<double> solutionStack;
 
     while (!inputQueue.empty()) {
         string currentElement = inputQueue.front();
         cout << "Looking at: " << currentElement  << endl;
         if (postfixHelper::isOperator(currentElement) == -1) { // Current element is #
-            solutionStack.push(atoi(currentElement.c_str()));
+            solutionStack.push(atof(currentElement.c_str()));
         } else { // Current element is an operator
 
-            int number2 = solutionStack.top();
+            double number2 = solutionStack.top();
             solutionStack.pop();
-            int number1 = solutionStack.top();
+            double number1 = solutionStack.top();
             solutionStack.pop();
 
             if (currentElement == "^") {
-                int temp = pow(number1, number2);
+                double temp = pow(number1, number2);
                 solutionStack.push(temp);
             } else if (currentElement == "*") {
-                int temp = number1 * number2;
+                double temp = number1 * number2;
                 solutionStack.push(temp);
             } else if (currentElement == "/") {
-                int temp = number1 / number2;
+                double temp = number1 / number2;
                 solutionStack.push(temp);
             } else if (currentElement == "+") {
-                int temp = number1 + number2;
+                double temp = number1 + number2;
                 solutionStack.push(temp);
             } else if (currentElement == "-") {
-                int temp = number1 - number2;
+                double temp = number1 - number2;
                 solutionStack.push(temp);
             }
         }
@@ -145,7 +145,7 @@ int postfixSolve(queue<T> inputQueue) {
 int main() {
     queue<string> inputQueue;
     queue<string> postfixQueue;
-    int answer;
+    double answer;
 
     // Input
     inputBuilder(inputQueue);
