@@ -4,8 +4,9 @@
  *  Project 1 COP3530
 **/
 
+#include <cstdlib>
 #include <iostream>
-#include <cstring>
+#include <string>
 #include <math.h>
 #include <stack>
 #include <stdlib.h>
@@ -14,7 +15,7 @@
 
 using namespace std;
 
-unordered_map<string, string> variables;
+unordered_map<string, double> variables;
 
 /* Struct to help with postfixFunctions */
 struct postfixHelper {
@@ -27,7 +28,9 @@ struct postfixHelper {
         else if (input == "/") {return 2;}
         else if (input == "+") {return 1;}
         else if (input == "-") {return 1;}
-        else { return -1;} // Input is a number TODO: Add support for variables above
+        else if (isalpha(input[0])) // Input is variable
+                               { return 4;}
+        else return -1; // Input is number
     }
     static bool isLeftAssociative(string input) {
         if (input == "*" || input == "/" ||
@@ -54,7 +57,7 @@ string inputBuilder(queue<T>& inputQueue) {
             */
             cin >> variableName;
             cin >> temp; // "="
-            variables.at(variableName) = "";
+            variables.insert({variableName, 0});
             while (cin.peek() != '\n') {
                 cin >> temp;
                 inputQueue.push(temp);
@@ -67,8 +70,9 @@ string inputBuilder(queue<T>& inputQueue) {
     return "";
 }
 
+/* Returns true if there are no issues with finding a variable */
 template <class T>
-void postfixBuilder(queue<T>& inputQueue, queue<T>& postfixQueue) {
+bool postfixBuilder(queue<T>& inputQueue, queue<T>& postfixQueue) {
     stack<T> operatorStack;
 
     while (!inputQueue.empty()) {
@@ -77,6 +81,13 @@ void postfixBuilder(queue<T>& inputQueue, queue<T>& postfixQueue) {
 
         if (precedence == -1) { // Current string is a number
             postfixQueue.push(currentElement);
+        } else if (precedence == 4) { // Current string variable
+            auto got = variables.find(currentElement);
+            if (got != variables.end()) { // Variable found
+                postfixQueue.push(to_string(got->second));
+            } else { // Variable not found
+                return false;
+            }
         } else { // Current string is not a number
 
             if (operatorStack.empty()) {
@@ -115,6 +126,7 @@ void postfixBuilder(queue<T>& inputQueue, queue<T>& postfixQueue) {
         postfixQueue.push(operatorStack.top());
         operatorStack.pop();
     }
+    return true;
 }
 
 /* Used for debug purposes */
@@ -166,34 +178,42 @@ double postfixSolve(queue<T> inputQueue) {
 
     ERROR_DIVISION_BY_ZERO:
         cout << "Division-By-Zero" << endl;
-        return (double)NULL; // <- Lol wut? Go c++!
+        return (double)NULL; // <- Lol wut? Go C++!
 }
 
 
 int main() {
     queue<string> inputQueue;
     queue<string> postfixQueue;
+    queue<string> empty;
     double answer;
 
     while (1) {
         // Input
         string variableName = inputBuilder(inputQueue);
+        //cout << "here" << endl;
 
         // Shunting yard
-        postfixBuilder(inputQueue, postfixQueue);
+        bool noProblems = postfixBuilder(inputQueue, postfixQueue);
 
-        // Calculate
-        answer = postfixSolve(postfixQueue);
-        if (answer) {
-            if (variableName != "") {
-                variables.at(variableName) = answer;
-            } else {
-                cout << answer << endl;
+        if (noProblems) {
+            // Calculate
+            answer = postfixSolve(postfixQueue);
+            if (answer) {
+                if (variableName != "") {
+                    auto search = variables.find(variableName);
+                    if (search != variables.end()) {
+                        variables[variableName] = answer;
+                    }
+                } else {
+                    cout << answer << endl;
+                }
             }
+        } else {
+            cout << "Undeclared-Variable" << endl;
         }
 
         // Empty queues
-        queue<string> empty;
         swap(inputQueue, empty);
         swap(postfixQueue, empty);
 
