@@ -89,13 +89,10 @@ bool postfixBuilder(queue<T>& inputQueue, queue<T>& postfixQueue) {
                 return false;
             }
         } else { // Current string is not a number
-
             if (operatorStack.empty()) {
                 operatorStack.push(currentElement);
             } else {
-
                 if (currentElement == "(") operatorStack.push(currentElement);
-
                 else if (currentElement == ")") {
                     while (operatorStack.top() != "(") {
                         postfixQueue.push(operatorStack.top());
@@ -106,7 +103,6 @@ bool postfixBuilder(queue<T>& inputQueue, queue<T>& postfixQueue) {
                     bool leftAssociative = postfixHelper::isLeftAssociative(currentElement);
                     while (!operatorStack.empty()) {
                         int operatorTopPrecedence = postfixHelper::isOperator(operatorStack.top());
-
                         if ((leftAssociative && precedence <= operatorTopPrecedence) ||
                             (!leftAssociative && precedence < operatorTopPrecedence)) {
                             string temp = operatorStack.top();
@@ -140,20 +136,17 @@ void printQueue(queue<T>& inputQueue) {
 }
 
 template <class T>
-double postfixSolve(queue<T> inputQueue) {
+double postfixSolve(queue<T>& inputQueue) {
     stack<double> solutionStack;
-
     while (!inputQueue.empty()) {
         string currentElement = inputQueue.front();
         if (postfixHelper::isOperator(currentElement) == -1) { // Current element is #
             solutionStack.push(atof(currentElement.c_str()));
         } else { // Current element is an operator
-
             double number2 = solutionStack.top();
             solutionStack.pop();
             double number1 = solutionStack.top();
             solutionStack.pop();
-
             if (currentElement == "^") {
                 double temp = pow(number1, number2);
                 solutionStack.push(temp);
@@ -175,7 +168,6 @@ double postfixSolve(queue<T> inputQueue) {
         inputQueue.pop();
     }
     return solutionStack.top();
-
     ERROR_DIVISION_BY_ZERO:
         cout << "Division-By-Zero" << endl;
         return (double)NULL; // <- Lol wut? Go C++!
@@ -187,24 +179,18 @@ int main() {
     queue<string> postfixQueue;
     queue<string> empty;
     double answer;
-
     while (1) {
         // Input
         string variableName = inputBuilder(inputQueue);
-        //cout << "here" << endl;
-
         // Shunting yard
         bool noProblems = postfixBuilder(inputQueue, postfixQueue);
-
         if (noProblems) {
             // Calculate
             answer = postfixSolve(postfixQueue);
             if (answer) {
                 if (variableName != "") {
                     auto search = variables.find(variableName);
-                    if (search != variables.end()) {
-                        variables[variableName] = answer;
-                    }
+                    variables[variableName] = answer;
                 } else {
                     cout << answer << endl;
                 }
@@ -212,11 +198,13 @@ int main() {
         } else {
             cout << "Undeclared-Variable" << endl;
         }
-
         // Empty queues
-        swap(inputQueue, empty);
-        swap(postfixQueue, empty);
-
+        while (!inputQueue.empty()) {
+            inputQueue.pop();
+        }
+        while (!postfixQueue.empty()) {
+            postfixQueue.pop();
+        }
         // Wait for user to enter next expression
         cin.ignore();
     }
