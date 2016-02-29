@@ -10,8 +10,11 @@
 #include <stack>
 #include <stdlib.h>
 #include <queue>
+#include <unordered_map>
 
 using namespace std;
+
+unordered_map<string, string> variables;
 
 /* Struct to help with postfixFunctions */
 struct postfixHelper {
@@ -33,15 +36,35 @@ struct postfixHelper {
     }
 };
 
+/* Returns a sting of the variable name if the user is inputing a variable.
+ * Otherwise returns a blank string
+ */
 template <class T>
-void inputBuilder(queue<T>& inputQueue) {
+string inputBuilder(queue<T>& inputQueue) {
     string temp;
+    string variableName;
 
     while (cin.peek() != '\n') {
         cin >> temp;
         if (temp == "quit") exit(1);
-        inputQueue.push(temp);
+        if (temp == "let") {
+            /* If the input is a variable, the program will solve for the
+             * variable and then input the value into the unordered map at the
+             * end for later use
+            */
+            cin >> variableName;
+            cin >> temp; // "="
+            variables.at(variableName) = "";
+            while (cin.peek() != '\n') {
+                cin >> temp;
+                inputQueue.push(temp);
+            }
+            return variableName;
+        } else {
+            inputQueue.push(temp);
+        }
     }
+    return "";
 }
 
 template <class T>
@@ -154,7 +177,7 @@ int main() {
 
     while (1) {
         // Input
-        inputBuilder(inputQueue);
+        string variableName = inputBuilder(inputQueue);
 
         // Shunting yard
         postfixBuilder(inputQueue, postfixQueue);
@@ -162,7 +185,11 @@ int main() {
         // Calculate
         answer = postfixSolve(postfixQueue);
         if (answer) {
-            cout << answer << endl;
+            if (variableName != "") {
+                variables.at(variableName) = answer;
+            } else {
+                cout << answer << endl;
+            }
         }
 
         // Empty queues
