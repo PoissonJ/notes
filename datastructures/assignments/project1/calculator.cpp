@@ -110,7 +110,6 @@ double postfixSolve(queue<T> inputQueue) {
 
     while (!inputQueue.empty()) {
         string currentElement = inputQueue.front();
-        cout << "Looking at: " << currentElement  << endl;
         if (postfixHelper::isOperator(currentElement) == -1) { // Current element is #
             solutionStack.push(atof(currentElement.c_str()));
         } else { // Current element is an operator
@@ -127,7 +126,7 @@ double postfixSolve(queue<T> inputQueue) {
                 double temp = number1 * number2;
                 solutionStack.push(temp);
             } else if (currentElement == "/") {
-                if (number2 == 0) goto ERROR;
+                if (number2 == 0) goto ERROR_DIVISION_BY_ZERO;
                 double temp = number1 / number2;
                 solutionStack.push(temp);
             } else if (currentElement == "+") {
@@ -142,7 +141,7 @@ double postfixSolve(queue<T> inputQueue) {
     }
     return solutionStack.top();
 
-    ERROR:
+    ERROR_DIVISION_BY_ZERO:
         cout << "Division-By-Zero" << endl;
         return (double)NULL; // <- Lol wut? Go c++!
 }
@@ -163,8 +162,15 @@ int main() {
         // Calculate
         answer = postfixSolve(postfixQueue);
         if (answer) {
-            cout << "Answer: " << answer << endl;
+            cout << answer << endl;
         }
+
+        // Empty queues
+        queue<string> empty;
+        swap(inputQueue, empty);
+        swap(postfixQueue, empty);
+
+        // Wait for user to enter next expression
         cin.ignore();
     }
     return 0;
