@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include <math.h>
+#include <regex>
 #include <stack>
 #include <stdlib.h>
 #include <queue>
@@ -47,24 +48,25 @@ string inputBuilder(queue<T>& inputQueue) {
     string temp;
     string variableName;
 
-    while (cin.peek() != '\n') {
-        cin >> temp;
-        if (temp == "quit") exit(1);
-        if (temp == "let") {
-            /* If the input is a variable, the program will solve for the
-             * variable and then input the value into the unordered map at the
-             * end for later use
-            */
-            cin >> variableName;
-            cin >> temp; // "="
-            variables.insert({variableName, 0});
-            while (cin.peek() != '\n') {
-                cin >> temp;
-                inputQueue.push(temp);
-            }
-            return variableName;
-        } else {
+    getline(cin, temp);
+    stringstream ss(temp);
+
+    ss >> temp;  // Capture first input to determine type of input
+    if (temp == "quit") exit(1);
+    if (temp == "let") {
+        //If the input is a variable, the program will solve for the
+        //variable and then input the value into the unordered map at the
+        ss >> variableName;
+        ss >> temp; // "="
+        variables.insert({variableName, 0});
+        while (ss >> temp) {  // Beginning of the expression to store
             inputQueue.push(temp);
+        }
+        return variableName;
+    } else { // Input is an expression
+        inputQueue.push(temp);
+        while (ss >> temp) {
+        inputQueue.push(temp);
         }
     }
     return "";
@@ -205,8 +207,6 @@ int main() {
         while (!postfixQueue.empty()) {
             postfixQueue.pop();
         }
-        // Wait for user to enter next expression
-        cin.ignore();
     }
     return 0;
 }
