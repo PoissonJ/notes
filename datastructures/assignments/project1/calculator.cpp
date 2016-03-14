@@ -55,7 +55,7 @@ string inputBuilder(queue<T>& inputQueue) {
     if (temp == "quit") exit(1);
     if (temp == "let") {
         //If the input is a variable, the program will solve for the
-        //variable and then input the value into the unordered map at the
+        //variable and then input the value into the unordered map
         ss >> variableName;
         ss >> temp; // "="
         variables.insert({variableName, 0});
