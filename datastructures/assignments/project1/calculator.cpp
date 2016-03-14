@@ -179,7 +179,6 @@ double postfixSolve(queue<T>& inputQueue) {
 int main() {
     queue<string> inputQueue;
     queue<string> postfixQueue;
-    queue<string> empty;
     double answer;
     while (1) {
         // Input
@@ -191,7 +190,7 @@ int main() {
             answer = postfixSolve(postfixQueue);
             if (answer) {
                 if (variableName != "") {
-                    auto search = variables.find(variableName);
+                    //auto search = variables.find(variableName);
                     variables[variableName] = answer;
                 } else {
                     cout << answer << endl;
