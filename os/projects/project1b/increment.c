@@ -22,8 +22,8 @@ int main(int argc, char * argv[]) {
                 }
                 for (int i = 0; i < numberOfLinesToAdd; i++) {
                     char str[3]; // Initialize new string to hold int
-                    sprintf(str, "%d\n", lastNumberInFile + (i + 1)); // Write to file
-                    fputs(str, fp);
+                    //sprintf(str, "%d\n", lastNumberInFile + (i + 1));
+                    fprintf(fp, "%d\n", lastNumberInFile + ( i + 1 )); // Write to file
                 }
                 return 0;
 
