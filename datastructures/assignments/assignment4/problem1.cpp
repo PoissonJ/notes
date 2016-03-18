@@ -9,6 +9,7 @@ struct node {
 	char element;
 };
 
+/* Debug purposes */
 void printArray(node* nodeArray, int size) {
 	for (int i = 0; i < size; i++) {
 		cout << nodeArray[i].element << endl;
@@ -39,8 +40,10 @@ void preOrder(node* currentNode) {
 int main(int argc, char **argv) {
 	int leftPosition;
 	int rightPosition;
-	char currentElement;
 	int numberOfNodes;
+	char currentElement;
+
+	int root; // Index of root of tree in case the input tries to trick the program
 
 	cin >> numberOfNodes;
 
@@ -59,13 +62,17 @@ int main(int argc, char **argv) {
 		if (rightPosition != -1)
 			nodeArray[i].right = &nodeArray[rightPosition];
 		else nodeArray[i].right = NULL;
+
+		if (leftPosition == 1 && rightPosition == 3) {
+			root = i;
+		}
 	}
 
-	postOrder(&nodeArray[0]);
+	postOrder(&nodeArray[root]);
 	cout << endl;
-	inOrder(&nodeArray[0]);
+	inOrder(&nodeArray[root]);
 	cout << endl;
-	preOrder(&nodeArray[0]);
+	preOrder(&nodeArray[root]);
 	cout << endl;
 
 
