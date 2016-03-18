@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
 			nodeArray[i].right = &nodeArray[rightPosition];
 		else nodeArray[i].right = NULL;
 
-		if (leftPosition == 1 && rightPosition == 3) {
+		if (leftPosition == 1 && rightPosition == 1) {
 			root = i;
 		}
 	}
