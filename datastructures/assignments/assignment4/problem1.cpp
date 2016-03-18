@@ -43,7 +43,6 @@ int main(int argc, char **argv) {
 	int numberOfNodes;
 	char currentElement;
 
-	int root; // Index of root of tree in case the input tries to trick the program
 
 	cin >> numberOfNodes;
 
@@ -63,18 +62,14 @@ int main(int argc, char **argv) {
 			nodeArray[i].right = &nodeArray[rightPosition];
 		else nodeArray[i].right = NULL;
 
-		if (leftPosition == 1 && rightPosition == 1) {
-			root = i;
-		}
 	}
 
-	postOrder(&nodeArray[root]);
+	postOrder(&nodeArray[0]);
 	cout << endl;
-	inOrder(&nodeArray[root]);
+	inOrder(&nodeArray[0]);
 	cout << endl;
-	preOrder(&nodeArray[root]);
+	preOrder(&nodeArray[0]);
 	cout << endl;
-
 
 	return 0;
 }

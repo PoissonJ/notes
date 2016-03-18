@@ -34,15 +34,12 @@ void levelOrder(node * currentNode) {
 int main(int argc, char **argv) {
 	int leftPosition;
 	int rightPosition;
-	int numberOfNodes;
 	char currentElement;
-
-	int root; // Index of root of tree in case the input tries to trick the program
+	int numberOfNodes;
 
 	cin >> numberOfNodes;
 
 	node nodeArray[numberOfNodes];
-
 
 	for (int i = 0; i < numberOfNodes; i++) {
 		cin >> currentElement;
@@ -58,9 +55,7 @@ int main(int argc, char **argv) {
 			nodeArray[i].right = &nodeArray[rightPosition];
 		else nodeArray[i].right = NULL;
 
-		if (leftPosition == 1 && rightPosition == 1) {
-			root = i;
-		}
 	}
-levelOrder(&nodeArray[root]);
+	levelOrder(&nodeArray[0]);
+	cout << endl;
 }
