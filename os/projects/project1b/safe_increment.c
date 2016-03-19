@@ -4,11 +4,7 @@
 #include <string.h>
 #include <sys/types.h>
 
-int counter = 1; // Global counter for each process to increment file
 int status; // Status variable for set and get functions. Not used but needed for implemented system call
-
-void increment(int pidOfOtherProcess, int numberOfLinesToAdd, incrementFile) {
-};
 
 int main(int argc, char * argv[]) {
     FILE * configFile;
@@ -68,6 +64,8 @@ int main(int argc, char * argv[]) {
         printf("INFO: Parent begun incrementing %s safely\n", argv[2]);
     else
         printf("INFO: Child begun incrementing %s safely\n", argv[2]);
+int parentCounter = 1; // Counter for each process to increment file
+int childCounter = 1; // Counter for each process to increment file
 
     if (idChild == 0){ // Parent process, process 0
         int shared;
@@ -75,7 +73,7 @@ int main(int argc, char * argv[]) {
         char flagAndTurn[3];
         flagAndTurn[2] = '\0';
 
-        while (counter < numberOfLinesToAdd) {
+        while (parentCounter <= numberOfLinesToAdd) {
             set_sv(11, &status); // Interested and turn belongs to process 1
             /* To avoid bitwise operations I check the value of shared literally */
             do {
@@ -89,7 +87,7 @@ int main(int argc, char * argv[]) {
             } while (flagAndTurn[0] == '1' && flagAndTurn[2] == '1');
 
             /****** Critical section ******/
-            incrementFile = fopen(argv[2], "r+") // Open file for reading and writing
+            incrementFile = fopen(argv[2], "r+"); // Open file for reading and writing
 
             /* Find last line */
             while (fgets(buff, 1024,(FILE*)incrementFile)) {
@@ -98,18 +96,20 @@ int main(int argc, char * argv[]) {
             }
 
             /* Computer Number to add */
-            int numberToAdd = lastNumberInFile + counter;
+            int numberToAdd = lastNumberInFile + 1;
 
             /* Append number to last line */
+            fprintf(incrementFile, "Parent\n");
             fprintf(incrementFile, "%d\n", numberToAdd);
 
             /* Close file */
             fclose(incrementFile);
 
-            counter++;
+            parentCounter++;
             /****** End Critical section ******/
             set_sv(1, &status);
         }
+	printf("INFO: Parent done incrementing\n");
     }
     else { // Child process, process 1
         int shared;
@@ -117,21 +117,21 @@ int main(int argc, char * argv[]) {
         char flagAndTurn[3];
         flagAndTurn[2] = '\0';
 
-        while (counter < numberOfLinesToAdd) {
-            set_sv(11, &status); // Interested and turn belongs to process 1
+        while (childCounter <= numberOfLinesToAdd) {
+            set_sv(2, &status); // Interested and turn belongs to process 0
             /* To avoid bitwise operations I check the value of shared literally */
             do {
-                int shared = get_sv(process1, &status);
+                int shared = get_sv(process0, &status);
                 switch (shared) {
                     case 0: flagAndTurn[0] = '0'; flagAndTurn[1] = '0'; break;
                     case 1: flagAndTurn[0] = '0'; flagAndTurn[1] = '1'; break;
                     case 2: flagAndTurn[0] = '1'; flagAndTurn[1] = '0'; break;
                     case 3: flagAndTurn[0] = '1'; flagAndTurn[1] = '1'; break;
                 }
-            } while (flagAndTurn[0] == '1' && flagAndTurn[2] == '1');
+            } while (flagAndTurn[0] == '0' && flagAndTurn[2] == '0');
 
             /****** Critical section ******/
-            incrementFile = fopen(argv[2], "r+") // Open file for reading and writing
+            incrementFile = fopen(argv[2], "r+"); // Open file for reading and writing
 
             /* Find last line */
             while (fgets(buff, 1024,(FILE*)incrementFile)) {
@@ -140,18 +140,20 @@ int main(int argc, char * argv[]) {
             }
 
             /* Computer Number to add */
-            int numberToAdd = lastNumberInFile + counter;
+            int numberToAdd = lastNumberInFile + 1;
 
             /* Append number to last line */
+            fprintf(incrementFile, "child\n");
             fprintf(incrementFile, "%d\n", numberToAdd);
 
             /* Close file */
             fclose(incrementFile);
 
-            counter++;
+            childCounter++;
             /****** End Critical section ******/
             set_sv(1, &status);
         }
+	printf("INFO: Child done incrementing\n");
 
     };
     return 0;
