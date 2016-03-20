@@ -15,6 +15,7 @@ int main() {
 
         /* Get second line from input */
         fgets(buff2, 1024, stdin);
+	if (feof(stdin)) break;
 
         /* Determine if the numbers are consective and print if not */
         firstNumber = atoi(buff1);
