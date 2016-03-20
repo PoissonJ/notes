@@ -4,14 +4,43 @@
 #include <string.h>
 #include <sys/types.h>
 
-int status; // Status variable for set and get functions. Not used but needed for implemented system call
+// Status variable for set and get functions. Not used but needed for implemented system call
+int status;
+int counter = 1;
+
+void criticalSection(char * fileName, bool isParent) {
+    FILE * incrementFile;
+    char buff[1024];
+    int lastNumberInFile;
+
+    incrementFile = fopen(fileName, "r+"); // Open file for reading and writing
+
+    /* Find last line */
+    while (fgets(buff, 1024,(FILE*)incrementFile)) {
+        if (feof(incrementFile)) break;
+        lastNumberInFile = atoi(buff);
+    }
+
+    /* Computer Number to add */
+    int numberToAdd = lastNumberInFile + 1;
+
+    /* Append number to last line */
+    if (isParent) fprintf(incrementFile, "Parent\n");
+    else fprintf(incrementFile, "child\n");
+    fprintf(incrementFile, "%d\n", numberToAdd);
+
+    /* Close file */
+    fclose(incrementFile);
+
+    counter++;
+}
+
 
 int main(int argc, char * argv[]) {
     FILE * configFile;
-    FILE * incrementFile;
     char buff0[1024];
     char buff1[1024];
-    char buff[1024];
+    char fileName[1024];
     int process0 = 0; // First process listed in config file
     int process1 = 0; // Second process listed in config file
     int numberOfLinesToAdd;
@@ -24,6 +53,7 @@ int main(int argc, char * argv[]) {
 
     /* Extract variables from command line */
     numberOfLinesToAdd = atoi(argv[1]);
+    strncpy(fileName, argv[2], 1024);
 
     /* Determine PIDs */
     pid_t idParent = getpid();
@@ -48,12 +78,14 @@ int main(int argc, char * argv[]) {
     }
 
     /* Read values from config file for uniformity */
-    configFile = fopen(argv[3], "r");
-    fgets(buff0, 1024, configFile); // Read process id for process 0
-    fgets(buff1, 1024, configFile); // Read process id for process 1
-    process0 = atoi(buff0);
-    process1 = atoi(buff1);
-    fclose(configFile);
+    while ((process0 == 0 && process1 == 0) || process0 == process1) {
+        configFile = fopen(argv[3], "r");
+        fgets(buff0, 1024, configFile); // Read process id for process 0
+        fgets(buff1, 1024, configFile); // Read process id for process 1
+        process0 = atoi(buff0);
+        process1 = atoi(buff1);
+        fclose(configFile);
+    }
 
     if (process0 == 0 || process1 == 0) {
         printf("ERROR in getting process numbers\n");
@@ -64,8 +96,7 @@ int main(int argc, char * argv[]) {
         printf("INFO: Parent begun incrementing %s safely\n", argv[2]);
     else
         printf("INFO: Child begun incrementing %s safely\n", argv[2]);
-int parentCounter = 1; // Counter for each process to increment file
-int childCounter = 1; // Counter for each process to increment file
+
 
     if (idChild == 0){ // Parent process, process 0
         int shared;
@@ -73,7 +104,7 @@ int childCounter = 1; // Counter for each process to increment file
         char flagAndTurn[3];
         flagAndTurn[2] = '\0';
 
-        while (parentCounter <= numberOfLinesToAdd) {
+        while (counter <= numberOfLinesToAdd) {
             set_sv(11, &status); // Interested and turn belongs to process 1
             /* To avoid bitwise operations I check the value of shared literally */
             do {
@@ -86,27 +117,8 @@ int childCounter = 1; // Counter for each process to increment file
                 }
             } while (flagAndTurn[0] == '1' && flagAndTurn[2] == '1');
 
-            /****** Critical section ******/
-            incrementFile = fopen(argv[2], "r+"); // Open file for reading and writing
+            criticalSection(fileName, true);
 
-            /* Find last line */
-            while (fgets(buff, 1024,(FILE*)incrementFile)) {
-                if (feof(incrementFile)) break;
-                lastNumberInFile = atoi(buff);
-            }
-
-            /* Computer Number to add */
-            int numberToAdd = lastNumberInFile + 1;
-
-            /* Append number to last line */
-            fprintf(incrementFile, "Parent\n");
-            fprintf(incrementFile, "%d\n", numberToAdd);
-
-            /* Close file */
-            fclose(incrementFile);
-
-            parentCounter++;
-            /****** End Critical section ******/
             set_sv(1, &status);
         }
 	printf("INFO: Parent done incrementing\n");
@@ -117,7 +129,7 @@ int childCounter = 1; // Counter for each process to increment file
         char flagAndTurn[3];
         flagAndTurn[2] = '\0';
 
-        while (childCounter <= numberOfLinesToAdd) {
+        while (counter <= numberOfLinesToAdd) {
             set_sv(2, &status); // Interested and turn belongs to process 0
             /* To avoid bitwise operations I check the value of shared literally */
             do {
@@ -130,27 +142,8 @@ int childCounter = 1; // Counter for each process to increment file
                 }
             } while (flagAndTurn[0] == '0' && flagAndTurn[2] == '0');
 
-            /****** Critical section ******/
-            incrementFile = fopen(argv[2], "r+"); // Open file for reading and writing
+            criticalSection(fileName, false);
 
-            /* Find last line */
-            while (fgets(buff, 1024,(FILE*)incrementFile)) {
-                if (feof(incrementFile)) break;
-                lastNumberInFile = atoi(buff);
-            }
-
-            /* Computer Number to add */
-            int numberToAdd = lastNumberInFile + 1;
-
-            /* Append number to last line */
-            fprintf(incrementFile, "child\n");
-            fprintf(incrementFile, "%d\n", numberToAdd);
-
-            /* Close file */
-            fclose(incrementFile);
-
-            childCounter++;
-            /****** End Critical section ******/
             set_sv(1, &status);
         }
 	printf("INFO: Child done incrementing\n");
