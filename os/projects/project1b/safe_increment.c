@@ -36,18 +36,17 @@ void criticalSection(char * fileName, int counter, int isParent) {
 
 int main(int argc, char * argv[]) {
     FILE * configFile;
+    FILE * incrementFile;
     char buff0[1024];
     char buff1[1024];
+    char buff[1024];
     char fileName[1024];
     int process0 = 0; // First process listed in config file
     int process1 = 0; // Second process listed in config file
-    int parentCounter = 1;
-    int childCounter = 1;
+    int counter = 1; // Counter for incrementing
     int numberOfLinesToAdd;
-    int returnStatus;
-    FILE * incrementFile;
-    char buff[1024];
     int lastNumberInFile;
+    int returnStatus;
 
     /* Make sure program is run with correct # of arguments */
     if (argc != 4) {
@@ -60,22 +59,23 @@ int main(int argc, char * argv[]) {
     strncpy(fileName, argv[2], 1024);
 
     /* Determine PIDs */
-    pid_t idParent = getpid();
-    printf("Process 1: %ld\n", (long)idParent);
-    pid_t idChild = fork();
-    if (idChild != 0)
-            printf("Process 2: %ld\n", (long)idChild);
+    pid_t child = fork();
+    if (child != 0) // Parent
+    	printf("Process 1: %d\n", getpid());
+    else // Child
+        printf("Process 2: %d\n", getpid());
 
     /* Write PID to configuration file */
     // Parent process will be process 0
-    if (idChild == 0) { // Current process is parent
+    if (child != 0) { // Parent
+        printf("INFO: Process 0 writing and securing safe config file\n");
         configFile = fopen(argv[3], "a");
-        fprintf(configFile, "%ld\n", (long)idParent);
+        fprintf(configFile, "%d\n", getpid());
         fclose(configFile);
-        printf("INFO: Creating and securing safe config file\n");
-    } else {
+    } else { // Child
+        printf("INFO: Process 1 writing and securing safe config file\n");
         configFile = fopen(argv[3], "a");
-        fprintf(configFile, "%ld\n", (long)idChild);
+        fprintf(configFile, "%d\n", getpid());
         fclose(configFile);
     }
 
@@ -83,7 +83,6 @@ int main(int argc, char * argv[]) {
     *  While loop makes sure the file has been written
     *  by both processes
     */
-    
     while (process0 == 0 || process1 == 0 ||
            process0 == process1 || process0 > process1) {
         configFile = fopen(argv[3], "r");
@@ -100,68 +99,53 @@ int main(int argc, char * argv[]) {
     }
 
 
-    if (idChild == 0){ // Parent process, process 0
+    if (child != 0){ // Parent process, process 0
         int shared;
         int lastNumberInFile;
-        char flagAndTurn[3];
-        flagAndTurn[2] = '\0';
 	
-        printf("INFO: Parent begun incrementing %s safely\n", argv[2]);
+        printf("INFO: Process 0 begun incrementing %s safely\n", argv[2]);
 
-        while (parentCounter <= numberOfLinesToAdd) {
-            set_sv(3, &status); // Interested and turn belongs to process 1
+        while (counter <= numberOfLinesToAdd) {
+            set_sv(1, &status); // Interested
 
-            /* To avoid bitwise operations I check the value of shared literally */
-            do {
-                int shared = get_sv(process1, &status);
-		//if (shared != 3) printf("%d\n", shared);
-                switch (shared) {
-                    case 0: flagAndTurn[0] = '0'; flagAndTurn[1] = '0'; break;
-                    case 1: flagAndTurn[0] = '0'; flagAndTurn[1] = '1'; break;
-                    case 2: flagAndTurn[0] = '1'; flagAndTurn[1] = '0'; break;
-                    case 3: flagAndTurn[0] = '1'; flagAndTurn[1] = '1'; break;
-                }
-            } while (flagAndTurn[0] == '1' && flagAndTurn[1] == '1');
+            while (get_sv(process1, &status) == 1 &&
+	           (get_sv(process0, & status) ^ get_sv(process1, &status)) == 1){
+		   // busy wait
+            }
 
-            criticalSection(fileName, parentCounter, 1);
-	    parentCounter++;
+            criticalSection(fileName, counter, 1);
 
-            set_sv(1, &status); // No longer interested and turn belongs to process 1
+	    counter++;
+
+            set_sv(0, &status); // Not intested
         }
-	printf("INFO: Parent done incrementing\n");
-	waitpid(process1, &returnStatus, 0);
+	printf("INFO: Process 0 done incrementing\n");
+
+    	waitpid(process1, &returnStatus, 0); // Wait for other process to finish
     }
     else { // Child process, process 1
         int shared;
         int lastNumberInFile;
-        char flagAndTurn[3];
-        flagAndTurn[2] = '\0';
 
-        printf("INFO: Child begun incrementing %s safely\n", argv[2]);
+        printf("INFO: Process 1 begun incrementing %s safely\n", argv[2]);
 
-        while (childCounter <= numberOfLinesToAdd) {
-            set_sv(2, &status); // Interested and turn belongs to process 0
+        while (counter <= numberOfLinesToAdd) {
+            set_sv(1, &status); // Interested
 
-            /* To avoid bitwise operations I check the value of shared literally */
-            do {
-                int shared = get_sv(process0, &status);
-                switch (shared) {
-                    case 0: flagAndTurn[0] = '0'; flagAndTurn[1] = '0'; break;
-                    case 1: flagAndTurn[0] = '0'; flagAndTurn[1] = '1'; break;
-                    case 2: flagAndTurn[0] = '1'; flagAndTurn[1] = '0'; break;
-                    case 3: flagAndTurn[0] = '1'; flagAndTurn[1] = '1'; break;
-                }
-            } while (flagAndTurn[0] == '0' && flagAndTurn[1] == '0');
+            while (get_sv(process0, &status) == 1 &&
+	           (get_sv(process0, & status) ^ get_sv(process1, &status)) == 0){
+		   // busy wait
+            }
 
-            criticalSection(fileName, childCounter, 0);
+            criticalSection(fileName, counter, 0);
 
-            childCounter++;
+            counter++;
 
-            set_sv(0, &status);
+            set_sv(0, &status); // Not interested
         }
-	printf("INFO: Child done incrementing\n");
-	waitpid(process0, &returnStatus, 0);
+	printf("INFO: Process 1 done incrementing\n");
 
+    	waitpid(process0, &returnStatus, 0); // Wait for other process to finish
     }
     return 0;
 }
