@@ -1,6 +1,7 @@
 # Project 1b
 
 Jonathan Poisson
+
 poissonj@ufl.edu
 
 ## Instruction
@@ -85,5 +86,6 @@ both processes are reading and writing into the file at the same time.
 
 Safe_increment seems to favor process 0 more than process 1, as process 0 will
 always finish first in every run I tried. The program still, however, completes
-the incrementing for both processes safely.
+the incrementing for both processes safely. This is probably due to the time is
+takes to run get_sv and set_sv as these command need to make a system call.
 
