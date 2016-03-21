@@ -8,7 +8,7 @@
 // Status variable for set and get functions. Not used but needed for implemented system call
 int status;
 
-void criticalSection(char * fileName, int counter) {
+void criticalSection(char * fileName) {
     FILE * incrementFile;
     char buff[1024];
     int lastNumberInFile;
@@ -57,25 +57,12 @@ int main(int argc, char * argv[]) {
     strncpy(fileName, argv[2], 1024);
 
     /* Determine PIDs */
-    pid_t child = fork();
-    if (child != 0) // Parent
-    	printf("INFO: Process 1: %d\n", getpid());
-    else // Child
-        printf("INFO: Process 2: %d\n", getpid());
+    pid_t processPID = getpid();
 
     /* Write PID to configuration file */
-    // Parent process will be process 0
-    if (child != 0) { // Parent
-        printf("INFO: Process 0 writing and securing safe config file\n");
-        configFile = fopen(argv[3], "a");
-        fprintf(configFile, "%d\n", getpid());
-        fclose(configFile);
-    } else { // Child
-        printf("INFO: Process 1 writing and securing safe config file\n");
-        configFile = fopen(argv[3], "a");
-        fprintf(configFile, "%d\n", getpid());
-        fclose(configFile);
-    }
+    configFile = fopen(argv[3], "a");
+    fprintf(configFile, "%d\n", getpid());
+    fclose(configFile);
 
     /* Read values from config file for uniformity
     *  While loop makes sure the file has been written
@@ -97,10 +84,10 @@ int main(int argc, char * argv[]) {
     }
 
 
-    if (child != 0){ // Parent process, process 0
+    if (processPID == process0){
         int shared;
         int lastNumberInFile;
-	
+
         printf("INFO: Process 0 begun incrementing %s safely\n", argv[2]);
 
         while (counter <= numberOfLinesToAdd) {
@@ -111,7 +98,7 @@ int main(int argc, char * argv[]) {
 		   // busy wait
             }
 
-            criticalSection(fileName, counter);
+            criticalSection(fileName);
 
 	    counter++;
 
@@ -121,7 +108,7 @@ int main(int argc, char * argv[]) {
 
     	waitpid(process1, &returnStatus, 0); // Wait for other process to finish
     }
-    else { // Child process, process 1
+    else {
         int shared;
         int lastNumberInFile;
 
@@ -135,7 +122,7 @@ int main(int argc, char * argv[]) {
 		   // busy wait
             }
 
-            criticalSection(fileName, counter);
+            criticalSection(fileName);
 
             counter++;
 
