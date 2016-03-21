@@ -21,9 +21,18 @@ void criticalSection(char * fileName) {
         if (feof(incrementFile)) break;
         lastNumberInFile = atoi(buff);
     }
+    fclose(incrementFile);
 
     /* Computer Number to add */
     int numberToAdd = lastNumberInFile + 1;
+
+    incrementFile = fopen(fileName, "r+"); // Open file for reading and writing
+
+    /* Find last line */
+    while (fgets(buff, 1024,(FILE*)incrementFile)) {
+        if (feof(incrementFile)) break;
+        lastNumberInFile = atoi(buff);
+    }
 
     /* Append number to last line */
     fprintf(incrementFile, "%d\n", numberToAdd);
@@ -89,10 +98,10 @@ int main(int argc, char * argv[]) {
 
         while (counter <= numberOfLinesToAdd) {
             set_sv(1, &status); // Interested
-            turn = 1;
 
+            turn = 1;
             while (get_sv(process1, &status) == 1 &&
-	           (turn = get_sv(process0, & status) ^ get_sv(process1, &status)) == 1){
+	           turn == (get_sv(process0, &status) ^ get_sv(process1, &status))){
 		   // busy wait
             }
 
@@ -101,6 +110,7 @@ int main(int argc, char * argv[]) {
 	    counter++;
 
             set_sv(0, &status); // Not intested
+	    sleep(1);
         }
 
 	pause();
@@ -109,10 +119,10 @@ int main(int argc, char * argv[]) {
 
         while (counter <= numberOfLinesToAdd) {
             set_sv(1, &status); // Interested
-            turn = 0;
 
+            turn = 0;
             while (get_sv(process0, &status) == 1 &&
-	           (turn = get_sv(process0, & status) ^ get_sv(process1, &status)) == 0){
+	           turn == (get_sv(process0, &status) ^ get_sv(process1, &status))){
 		   // busy wait
             }
 
@@ -121,6 +131,7 @@ int main(int argc, char * argv[]) {
             counter++;
 
             set_sv(0, &status); // Not interested
+	    sleep(1);
         }
 
 	kill(process0, 0);
