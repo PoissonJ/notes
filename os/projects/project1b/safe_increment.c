@@ -46,6 +46,7 @@ int main(int argc, char * argv[]) {
     int numberOfLinesToAdd;
     int lastNumberInFile;
     int returnStatus;
+    int turn;
 
     /* Make sure program is run with correct # of arguments */
     if (argc != 4) {
@@ -85,14 +86,13 @@ int main(int argc, char * argv[]) {
     }
 
     if (processPID == process0){
-        int shared;
-        int lastNumberInFile;
 
         while (counter <= numberOfLinesToAdd) {
             set_sv(1, &status); // Interested
+            turn = 1;
 
             while (get_sv(process1, &status) == 1 &&
-	           (get_sv(process0, & status) ^ get_sv(process1, &status)) == 1){
+	           (turn = get_sv(process0, & status) ^ get_sv(process1, &status)) == 1){
 		   // busy wait
             }
 
@@ -106,14 +106,13 @@ int main(int argc, char * argv[]) {
 	pause();
     }
     else {
-        int shared;
-        int lastNumberInFile;
 
         while (counter <= numberOfLinesToAdd) {
             set_sv(1, &status); // Interested
+            turn = 0;
 
             while (get_sv(process0, &status) == 1 &&
-	           (get_sv(process0, & status) ^ get_sv(process1, &status)) == 0){
+	           (turn = get_sv(process0, & status) ^ get_sv(process1, &status)) == 0){
 		   // busy wait
             }
 
