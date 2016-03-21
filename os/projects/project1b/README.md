@@ -12,10 +12,11 @@ A make file is included. There are 5 commands
  * `make consecutive` which compiles consecutive
  * `make safe_increment` which compiles safe_increment and creates a txt file
     with 10 lines labeled 1 through 10
- * `make clean` to delete the compiled programs
+ * `make clean` to delete the compiled programs, foo.txt and config
  * `make` that compiles everything.
 
-The execution below follows running simply `make`
+The execution below follows running simply `make` and then `make clean` after
+the execution.
 
 ## Execution
 

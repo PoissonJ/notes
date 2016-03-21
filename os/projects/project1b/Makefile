@@ -15,3 +15,4 @@ clean:
 	rm -f consecutive;
 	rm -f safe_increment;
 	rm -f foo.txt;
+	rm -f config;
