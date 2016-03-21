@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -83,12 +84,9 @@ int main(int argc, char * argv[]) {
         exit(1);
     }
 
-
     if (processPID == process0){
         int shared;
         int lastNumberInFile;
-
-        printf("INFO: Process 0 begun incrementing %s safely\n", argv[2]);
 
         while (counter <= numberOfLinesToAdd) {
             set_sv(1, &status); // Interested
@@ -104,15 +102,12 @@ int main(int argc, char * argv[]) {
 
             set_sv(0, &status); // Not intested
         }
-	printf("INFO: Process 0 done incrementing\n");
 
-    	waitpid(process1, &returnStatus, 0); // Wait for other process to finish
+	pause();
     }
     else {
         int shared;
         int lastNumberInFile;
-
-        printf("INFO: Process 1 begun incrementing %s safely\n", argv[2]);
 
         while (counter <= numberOfLinesToAdd) {
             set_sv(1, &status); // Interested
@@ -128,9 +123,8 @@ int main(int argc, char * argv[]) {
 
             set_sv(0, &status); // Not interested
         }
-	printf("INFO: Process 1 done incrementing\n");
 
-    	waitpid(process0, &returnStatus, 0); // Wait for other process to finish
+	kill(process0, 0);
     }
     return 0;
 }
