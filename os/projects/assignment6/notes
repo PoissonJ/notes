@@ -1,0 +1,5 @@
+Change the 4th bit of x so it is equal to the not of the 4th bit of y
+
+y & (1 << 4) to flip the 4th bit of y
+if it a 0, y&(1 << 4) == 0. In that case, we set the 4th bit of x to be on. z = x | (1 << 4)
+if it a 1, y&(1 << 4) != 0. In that case, we set the 4th bit of x to be off. z = x & ~(1 << 4)
