@@ -7,6 +7,7 @@ poissonj@ufl.edu
 
 ### Increment
 
+~~~
 > cat foo.txt
 > 1
 > 2
@@ -30,9 +31,10 @@ poissonj@ufl.edu
 > 14
 > 14
 > ... for a long time
-
+~~~
 ### Safe Increment
 
+~~~
 > cat foo.txt
 > 1
 > 2
@@ -48,6 +50,7 @@ poissonj@ufl.edu
 > ./safe_increment 10000 foo.txt config & ./safe_increment 10000 foo.txt config
 > ./consecutive < foo.txt
 >
+~~~
 
 ## Discussion
 
