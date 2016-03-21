@@ -37,7 +37,7 @@ void preOrder(node* currentNode) {
 	preOrder(currentNode->right);
 }
 
-int main(int argc, char **argv) {
+int main() {
 	int leftPosition;
 	int rightPosition;
 	int numberOfNodes;

@@ -31,7 +31,7 @@ void levelOrder(node * currentNode) {
 	}
 }
 
-int main(int argc, char **argv) {
+int main() {
 	int leftPosition;
 	int rightPosition;
 	char currentElement;

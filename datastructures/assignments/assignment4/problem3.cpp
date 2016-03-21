@@ -23,16 +23,12 @@ int getInorderIndex(char inorderArray[], int start, int end, char element) {
 node* constructTree(char * postorderArray, char * inorderArray,
 		int iStart, int iEnd, int pStart, int pEnd) {
 
-//	static int pIndex = 0;
-
 	if (iStart > iEnd || pStart > pEnd) {
 		return NULL;
 	}
 	char rootElement = postorderArray[pEnd];
 	node * rootNode = new node;
 	rootNode->element = rootElement;
-
-//	pIndex++;
 
 	if (iStart == iEnd) return rootNode;
 
@@ -66,7 +62,7 @@ void levelOrder(node * currentNode) {
 	}
 }
 
-int main(int argc, char **argv) {
+int main() {
 	int numberOfNodes;
 
 	cin >> numberOfNodes;
