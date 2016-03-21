@@ -8,7 +8,7 @@
 // Status variable for set and get functions. Not used but needed for implemented system call
 int status;
 
-void criticalSection(char * fileName, int counter, int isParent) {
+void criticalSection(char * fileName, int counter) {
     FILE * incrementFile;
     char buff[1024];
     int lastNumberInFile;
@@ -25,8 +25,6 @@ void criticalSection(char * fileName, int counter, int isParent) {
     int numberToAdd = lastNumberInFile + 1;
 
     /* Append number to last line */
-    if (isParent) fprintf(incrementFile, "Parent %d\n", counter);
-    else fprintf(incrementFile, "child %d\n", counter);
     fprintf(incrementFile, "%d\n", numberToAdd);
 
     /* Close file */
@@ -61,9 +59,9 @@ int main(int argc, char * argv[]) {
     /* Determine PIDs */
     pid_t child = fork();
     if (child != 0) // Parent
-    	printf("Process 1: %d\n", getpid());
+    	printf("INFO: Process 1: %d\n", getpid());
     else // Child
-        printf("Process 2: %d\n", getpid());
+        printf("INFO: Process 2: %d\n", getpid());
 
     /* Write PID to configuration file */
     // Parent process will be process 0
@@ -113,7 +111,7 @@ int main(int argc, char * argv[]) {
 		   // busy wait
             }
 
-            criticalSection(fileName, counter, 1);
+            criticalSection(fileName, counter);
 
 	    counter++;
 
@@ -137,7 +135,7 @@ int main(int argc, char * argv[]) {
 		   // busy wait
             }
 
-            criticalSection(fileName, counter, 0);
+            criticalSection(fileName, counter);
 
             counter++;
 
