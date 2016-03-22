@@ -79,14 +79,18 @@ int main(int argc, char * argv[]) {
     *  While loop makes sure the file has been written
     *  by both processes
     */
-    while (process0 == 0 || process1 == 0 ||
-           process0 == process1 || process0 > process1) {
+    while (process0 == 0 || process1 == 0) {
         configFile = fopen(argv[3], "r");
         fgets(buff0, 1024, configFile); // Read process id for process 0
         fgets(buff1, 1024, configFile); // Read process id for process 1
         process0 = atoi(buff0);
         process1 = atoi(buff1);
         fclose(configFile);
+    }
+    if (process0 > process1) {
+    	int temp = process0;
+	process0 = process1;
+	process1 = temp;
     }
 
     if (process0 == 0 || process1 == 0) {
@@ -110,10 +114,7 @@ int main(int argc, char * argv[]) {
 	    counter++;
 
             set_sv(0, &status); // Not intested
-	    sleep(1);
         }
-
-	pause();
     }
     else {
 
@@ -131,10 +132,7 @@ int main(int argc, char * argv[]) {
             counter++;
 
             set_sv(0, &status); // Not interested
-	    sleep(1);
         }
-
-	kill(process0, 0);
     }
     return 0;
 }
