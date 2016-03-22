@@ -42,6 +42,7 @@ void criticalSection(char * fileName, int numberOfLinesToAdd) {
 
         /* Close file */
         fclose(incrementFile);
+	counter++;
     }
 }
 
@@ -128,6 +129,4 @@ int main(int argc, char * argv[]) {
 
             set_sv(0, &status); // Not interested
         }
-    }
-    return 0;
 }
