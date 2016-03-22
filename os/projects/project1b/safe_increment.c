@@ -1,5 +1,4 @@
 #include <unistd.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,36 +8,41 @@
 // Status variable for set and get functions. Not used but needed for implemented system call
 int status;
 
-void criticalSection(char * fileName) {
+void criticalSection(char * fileName, int numberOfLinesToAdd) {
+    int counter = 1;
     FILE * incrementFile;
     char buff[1024];
     int lastNumberInFile;
 
-    incrementFile = fopen(fileName, "r+"); // Open file for reading and writing
+    while (counter <= numberOfLinesToAdd) {
 
-    /* Find last line */
-    while (fgets(buff, 1024,(FILE*)incrementFile)) {
-        if (feof(incrementFile)) break;
-        lastNumberInFile = atoi(buff);
+        incrementFile = fopen(fileName, "r+"); // Open file for reading and writing
+
+        /* Find last line */
+        while (fgets(buff, 1024,(FILE*)incrementFile)) {
+            if (feof(incrementFile)) break;
+            lastNumberInFile = atoi(buff);
+        }
+
+        fclose(incrementFile);
+
+        /* Computer Number to add */
+        int numberToAdd = lastNumberInFile + 1;
+
+        incrementFile = fopen(fileName, "r+"); // Open file for reading and writing
+
+        /* Find last line */
+        while (fgets(buff, 1024,(FILE*)incrementFile)) {
+            if (feof(incrementFile)) break;
+            lastNumberInFile = atoi(buff);
+        }
+
+        /* Append number to last line */
+        fprintf(incrementFile, "%d\n", numberToAdd);
+
+        /* Close file */
+        fclose(incrementFile);
     }
-    fclose(incrementFile);
-
-    /* Computer Number to add */
-    int numberToAdd = lastNumberInFile + 1;
-
-    incrementFile = fopen(fileName, "r+"); // Open file for reading and writing
-
-    /* Find last line */
-    while (fgets(buff, 1024,(FILE*)incrementFile)) {
-        if (feof(incrementFile)) break;
-        lastNumberInFile = atoi(buff);
-    }
-
-    /* Append number to last line */
-    fprintf(incrementFile, "%d\n", numberToAdd);
-
-    /* Close file */
-    fclose(incrementFile);
 }
 
 
@@ -53,8 +57,6 @@ int main(int argc, char * argv[]) {
     int process1 = 0; // Second process listed in config file
     int counter = 1; // Counter for incrementing
     int numberOfLinesToAdd;
-    int lastNumberInFile;
-    int returnStatus;
     int turn;
 
     /* Make sure program is run with correct # of arguments */
@@ -100,7 +102,6 @@ int main(int argc, char * argv[]) {
 
     if (processPID == process0){
 
-        while (counter <= numberOfLinesToAdd) {
             set_sv(1, &status); // Interested
 
             turn = 1;
@@ -109,16 +110,12 @@ int main(int argc, char * argv[]) {
 		   // busy wait
             }
 
-            criticalSection(fileName);
-
-	    counter++;
+            criticalSection(fileName, numberOfLinesToAdd);
 
             set_sv(0, &status); // Not intested
-        }
     }
     else {
 
-        while (counter <= numberOfLinesToAdd) {
             set_sv(1, &status); // Interested
 
             turn = 0;
@@ -127,9 +124,7 @@ int main(int argc, char * argv[]) {
 		   // busy wait
             }
 
-            criticalSection(fileName);
-
-            counter++;
+            criticalSection(fileName, numberOfLinesToAdd);
 
             set_sv(0, &status); // Not interested
         }
