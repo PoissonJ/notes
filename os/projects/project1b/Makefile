@@ -8,7 +8,8 @@ consecutive:
 
 safe_increment:
 	cc safe_increment.c -o safe_increment;
-	echo "1\n\n3\n4\n5\n6\n7\n8\n9\n10" > foo.txt
+	echo "1" > foo.txt;
+	echo: > foo.txt;
 
 clean:
 	rm -f increment;
