@@ -56,17 +56,19 @@ on a single text file while incrementing the last number in the text file for
 an inputted number of times. This is accomplished using Peterson's algorithm.
 The critical section for the program is the act of entering into the file
 times, reading the last value, incrementing by one and then writing the new
-value back into the file. The flag and turn variables in Peterson's algorithm
-are created by using each process' shared_val as the turn variable, and then
-computing the XOR of the two shared_vals for the turn bit. While the turn bit
-is not necessarily shared by each program, the computation of the XOR between
-the different shared_vals allows for each process to have a copy of the turn
-bit that matches the other process' value. The program that does not use this
-type of mutual exclusion (increment) writes duplicates to the outputted text
-file as both processes are reading and writing into the file at the same time.
+value back into the file, all of this a total of N times. The flag and turn
+variables in Peterson's algorithm are created by using each process' shared_val
+as the turn variable, and then computing the XOR of the two shared_vals for the
+turn bit. While the turn bit is not necessarily shared by each program, the
+computation of the XOR between the different shared_vals allows for each
+process to have a copy of the turn bit that matches the other process' value.
+The program that does not use this type of mutual exclusion (increment) writes
+duplicates to the outputted text file as both processes are reading and writing
+into the file at the same time. A race condition appears almost instantly as
+the numbers written to the files are duplicates.
 
 I chose for my critical section to be allowing one process into the critical
-section, allowing it fo increment its full N times, and then having it leave
+section, allowing it to increment its full N times, and then having it leave
 the critical section and thus give control to the other process. This simpler
 method, however, still follows the Peterson's algorithm as each process is run
 at the same time and then the algorithm determines which process to run first
