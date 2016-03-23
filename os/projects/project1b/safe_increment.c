@@ -113,7 +113,7 @@ int main(int argc, char * argv[]) {
 
             criticalSection(fileName, numberOfLinesToAdd);
 
-            set_sv(0, &status); // Not intested
+            set_sv(0, &status); // Not interested
     }
     else {
 
