@@ -6,18 +6,17 @@
 using namespace std;
 
 struct node {
-	node * left = NULL;
-	node * right = NULL;
+	node * left;
+	node * right;
 	char element;
 };
 
 int getInorderIndex(char inorderArray[], int start, int end, char element) {
-	for (int i = 0; i <= end; i++) {
+	for (int i = start; i <= end; i++) {
 		if (inorderArray[i] == element) {
 			return i;
 		}
 	}
-	exit(-1);  // Problem with input
 }
 
 node* constructTree(char * postorderArray, char * inorderArray,
@@ -32,11 +31,16 @@ node* constructTree(char * postorderArray, char * inorderArray,
 
 	if (iStart == iEnd) return rootNode;
 
-	int inorderIndex = getInorderIndex(inorderArray, iStart, iEnd, rootNode->element);
+        int inorderIndex = -1;
+	inorderIndex = getInorderIndex(inorderArray, iStart, iEnd, rootNode->element);
+        if (inorderIndex == -1) return NULL;
+        int lTreeSize = inorderIndex - iStart;
+        int rTreeSize = iEnd - inorderIndex;
+
 	rootNode->left = constructTree(postorderArray, inorderArray, iStart, inorderIndex - 1,
-			pStart, pStart + inorderIndex - (iStart + 1));
+			pStart, pStart + lTreeSize - 1);
 	rootNode->right = constructTree(postorderArray, inorderArray, inorderIndex + 1, iEnd,
-			pStart + inorderIndex - iStart, pEnd - 1);
+			pEnd - rTreeSize, pEnd - 1);
 
 	return rootNode;
 }
@@ -72,7 +76,6 @@ int main() {
 
 	for (int i = 0; i < numberOfNodes; i++) {
 		cin >> postorderArray[i];
-
 	}
 
 	for (int i = 0; i < numberOfNodes; i++) {
