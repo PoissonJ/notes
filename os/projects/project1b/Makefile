@@ -9,7 +9,6 @@ consecutive:
 safe_increment:
 	cc safe_increment.c -o safe_increment;
 	echo "1" > foo.txt;
-	echo: > foo.txt;
 
 clean:
 	rm -f increment;
