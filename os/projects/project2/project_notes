@@ -1,0 +1,58 @@
+Code - Makefile - Referencse
+
+Top part, copy past into header file
+
+Implementing multivalued first is preferred as the other are specific cases
+
+A semaphore is a # that is synchronized and shared between processes
+2 operations on semaphores:
+ * P (take, or down) - take (s) { while (s <= 0) //wait  then s--
+ * V (get, or up) - Add 1 to semaphore
+
+Project1b with a semaphore
+
+S = 1 // Both processes have this
+for (------) {
+    // Blocks until it can take one off of S
+    take(s)
+    -----------
+    give(S)
+}
+
+Semaphore needed: Database with 10 connections
+We have a pool of processes that have sharred semaphores
+Start with S=10
+When one enters it takes from S, then gives back to S
+Need to be aware of Resources and deadlock. If R is empty and the queue for S
+is full, the processes will be stuck waiting
+
+All 4 need to by system calls :(, even if they may be wrappers around get and
+set sv which they probably wont be. Just need to include unistd.h to include
+them, like project 1. Should include descriptions of the functions and how we
+implemented them. Probably going to use a patch again
+
+Tips:
+How are we going to implement a semaphore in the OS? The idea is that when you
+call take you are put in a queue.
+We have semaphore S and queue Q
+Call take and S is 0, added to Q
+Q { A, B, C }
+When one of the elements calls give, take one element from the queue if FIFO order.
+If there is nothing in the queue, we need to increment S
+
+How do we mannage the creation of S and Q though?
+For the queue do not use a linked list! Need fixed sized bounded arrays
+Lets say you define S as semaphore S[100] we can have up to 20 processes (Q[100][20])
+blocked waiting on it
+create returns index + 1
+If a process dies and does not call delete semaphore, we need to delete it as
+semaphores are a finite resource. Therefore need a structure that keeps track
+of which which process has access to semaphores
+
+parent process {
+    S = create_sem()
+    // fork some number of times to create children that have access to the semaphores
+
+}
+
+We can now implrmenet create, delete, up and down but the exec will be the problem.
