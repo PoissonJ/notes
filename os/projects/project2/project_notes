@@ -60,12 +60,27 @@ We can now implrmenet create, delete, up and down but the exec will be the probl
 
 
 Project 2 Hints
-Refer to Project #1 for adding system calls to PM. You can add either 4 new system calls (create,up,down,close) or you can multiplex those operations through 1/2 system calls.
-For passing arguments for your system calls (semaphore descriptors), refer to your Project #1 implementation and how you passed the child's PID for promote. (e.g., message m; m.m1_i1 = 1;)
-An important part of semaphore down/up is blocking/waking threads on resource contention. (waitpid does something similar in forkexit.c)
-Blocking processes: You can simply return a special value (SUSPEND) which indicates to PM that it should not respond to the calling process's system call yet.
-Waking processes: Use the setreply function in PM (main.c) to signal a wakeup to a process. The first parameter of this method indicates what process to wake. The second parameter is the return value of the system call for that process.
-Many processes can be blocked on a single semaphore, thus these processes must be stored in a queue (FIFO) in order to wake them later. In particular, you want to store the process's index, -not- its PID.
-Inheritance of semaphores must be performed whenever a child process is forked. The fork code can be found in PM's forkexit.c in do_fork().
-Releasing unclosed semaphores must also be handled for a process when it dies/exits. This can be found in two areas, forkexit.c for clean exits and signal.c for signals that will kill a process (signal.c modifications aren't necessary, the kill code is forwarded back to forkexit.c.).
-Tip: When developing the project, it is easy to test semaphores if one process performs: sem_down, scanf(...) /*wait for user input*/, sem_up. The other process can simply do: sem_down, printf(...), sem_up. This allows for controlled access of semaphores for functionality verification.
+Refer to Project #1 for adding system calls to PM. You can add either 4 new
+system calls (create,up,down,close) or you can multiplex those operations
+through 1/2 system calls.  For passing arguments for your system calls
+(semaphore descriptors), refer to your Project #1 implementation and how you
+passed the child's PID for promote. (e.g., message m; m.m1_i1 = 1;) An
+important part of semaphore down/up is blocking/waking threads on resource
+contention. (waitpid does something similar in forkexit.c) Blocking processes:
+You can simply return a special value (SUSPEND) which indicates to PM that it
+should not respond to the calling process's system call yet.  Waking processes:
+Use the setreply function in PM (main.c) to signal a wakeup to a process. The
+first parameter of this method indicates what process to wake. The second
+parameter is the return value of the system call for that process.  Many
+processes can be blocked on a single semaphore, thus these processes must be
+stored in a queue (FIFO) in order to wake them later. In particular, you want
+to store the process's index, -not- its PID.  Inheritance of semaphores must be
+performed whenever a child process is forked. The fork code can be found in
+PM's forkexit.c in do_fork().  Releasing unclosed semaphores must also be
+handled for a process when it dies/exits. This can be found in two areas,
+forkexit.c for clean exits and signal.c for signals that will kill a process
+(signal.c modifications aren't necessary, the kill code is forwarded back to
+forkexit.c.).  Tip: When developing the project, it is easy to test semaphores
+if one process performs: sem_down, scanf(...) /*wait for user input*/, sem_up.
+The other process can simply do: sem_down, printf(...), sem_up. This allows for
+controlled access of semaphores for functionality verification.
