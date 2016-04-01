@@ -11,7 +11,8 @@ stand-alone semaphore service. Instead of adding semaphore operations to the PM
 of VFS server, I found that I had more freedom and ease of implementation by
 creating a new service to run a unique service. This service controls the
 creation of semaphores, the waiting queue, and the up and down operations on
-the semaphores. The service is started up automatically when the OS boots.
+the semaphores. The service is started up automatically when the OS boots by
+adding the service to `/kernel/table.c`.
 
 #### Create Semaphore
 
