@@ -2,6 +2,12 @@
 
 Jonathan Poisson -- Poisson.Jonathan777@gmail.com
 
+To get the patch to run, I had to do the following. This will assure the server starts up
+
+1) cd /usr/src
+2) run `git apply --reject --whitespace=fix (path to project2-submission.patch)`
+3) make build && make install && reboot
+
 ## Overall Implementation
 
 ### Server
