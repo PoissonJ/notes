@@ -24,16 +24,20 @@ adding the service to `/kernel/table.c`.
 
 Below is a brief explanation of the operations. All of the semaphore data and
 semaphore array manipulation operations is held in semaphore_data.c and the
-system calls that control these operations is held in semaphore_operations.c I
+syscalls that control these operations is held in semaphore_operations.c I
 tried to treat is almost like a model, view and controller pattern (MVC with
 the view being the user calls).
 
 Note: Because Dr. Newman told me that the semaphore number should be dynamic, I
 originally implemented the semaphores as a linked list allowing for dynamic
 construction and unlimited semaphores. However, after speaking with David in
-discussion on 4/4, I changed the semaphore to be a fixed-sized array but left
-the process queues ar linked list so all my work creating a linked list class
-didn't go to waste.
+discussion on April 4th, I changed the semaphore to be a fixed-sized array but
+left the process queues as a linked list so all my work creating a linked list
+class didn't go to waste.
+
+For a shorter version of what is below, I have created man pages that show up
+when running either `man create_semaphore`, `man delete_semaphore`, `man up`,
+or `man down`.
 
 #### Create Semaphore
 
@@ -53,8 +57,8 @@ Delete semaphore takes a semaphore handle (index in semaphore array) and has
 the purpose of freeing a spot in the semaphore array (setting its value back to
 -1 and all other fields to NULL).  The call is successful and will return -1 if
 the semaphore handle is a valid entry in the array and has a created semaphore
-in the given index. The call to delete_semaphore can will faill if there are
-any processes waiting in the process queue, however.
+in the given index. The call to delete_semaphore can will fail if there are any
+processes waiting in the process queue, however.
 
 #### Down
 
@@ -67,17 +71,17 @@ decremented by 1 and the process continues running. The waiting process queue
 is a linked list like implementation. Each waiting process is pointing to the
 next waiting process, and new process are added onto the end of the queue. If,
 for some reason, the process queue tries to wake up a waiting process and the
-process happens to have died, it will contintue to wake up the next waiting
+process happens to have died, it will continue to wake up the next waiting
 process until it is successful (this will avoid deadlock).
 
 #### Up
 
 Up takes a semaphore handle (index in semaphore array) and has the purpose of
 incrementing the current semaphore. If the specified semaphore is of type
-binary and the caller wants to up a 1, it will fail. If the current value of
+binary and the caller wants to up a 1, it **will fail**. If the current value of
 the semaphore is 0, the up operation will first check to see if there are any
 waiting processes in the waiting processes array. If there is one, it will be
-woken up with a message, removed from the waiting procss queue, and the
+woken up with a message, removed from the waiting process queue, and the
 semaphore value will remain the same.
 
 ## Bugs
@@ -106,7 +110,7 @@ to reset the system, as refreshing the service is also blocked.
 
 ### Garbage collection
 
-Because my implementation of semaphores was a seperate server, I had some
+Because my implementation of semaphores was a separate server, I had some
 issues linking processes to the created semaphores. I exhausted every solution
 I could think of to fix the last test case (cleanup) where a process creates
 semaphores until there is no space, and then the semaphore is deleted when the
@@ -117,10 +121,10 @@ due to deadlock with too many messages being passed. My solution is as
 follows...
 
 Each semaphore created stores the endpoint of the process that created it. I
-used enpoints because they are more easily available in the semaphore server as
-the server is woken up with messages anyways. If a process tries to create a
+used endpoints because they are more easily available in the semaphore server
+as the server is woken up with messages anyways. If a process tries to create a
 semaphore but the semaphore array is full, garbage collection will occur. The
-garbage collection will delete the ONLY the semaphores that have an endpoint
+garbage collection will delete the *ONLY* the semaphores that have an endpoint
 that matches the process calling create_semaphore. This solves the test case
 that was sent out by the TA, as an individual process is in a loop creating
 useless semaphore. The bug is that if the user were to run 99 unique processes
