@@ -1,0 +1,1279 @@
+diff --git a/etc/system.conf b/etc/system.conf
+index 9f8fe39..adafdf7 100644
+--- a/etc/system.conf
++++ b/etc/system.conf
+@@ -21,6 +21,7 @@ service rs
+ 	quantum	       500;	# default server quantum
+ };
+ 
++
+ service ds
+ {
+ 	uid     0;
+@@ -35,6 +36,20 @@ service ds
+ 	quantum	       500;	# default server quantum
+ };
+ 
++service semaphore
++{
++	uid     0;
++	ipc	ALL_SYS;	# All system ipc targets allowed
++	system	ALL;		# ALL kernel calls allowed
++	vm	BASIC;		# Only basic VM calls allowed
++	io	NONE;		# No I/O range allowed
++	irq	NONE;		# No IRQ allowed
++	sigmgr          rs;	# Signal manager is RS
++	scheduler   KERNEL;	# Scheduler is KERNEL
++	priority	 4;	# priority queue 4
++	quantum	       500;	# default server quantum
++};
++
+ service vm
+ {
+ 	uid     0;
+@@ -229,6 +244,7 @@ service log
+ 	quantum	        50;	# default driver quantum
+ };
+ 
++
+ service init
+ {
+ 	uid     0;
+diff --git a/include/minix/callnr.h b/include/minix/callnr.h
+index 6f145cf..b9d5f7b 100644
+--- a/include/minix/callnr.h
++++ b/include/minix/callnr.h
+@@ -54,7 +54,9 @@
+ #define LSTAT		  53
+ #define IOCTL		  54
+ #define FCNTL		  55
++#define CREATE_SEMAPHORE  56
+ #define FS_READY	  57
++#define SEM_UP            58
+ #define EXEC		  59
+ #define UMASK		  60 
+ #define CHROOT		  61 
+@@ -65,6 +67,10 @@
+ #define SETGROUPS_O	  66
+ #define GETMCONTEXT       67
+ #define SETMCONTEXT       68
++#define SEM_DOWN 69
++#define DELETE_SEMAPHORE 70 
++
++
+ 
+ /* Posix signal handling. */
+ #define SIGACTION	  71
+@@ -109,6 +115,7 @@
+ 
+ #define PM_GETSID	113	/* PM getsid() */
+ 
++
+ #define TASK_REPLY	121	/* to VFS: reply code from drivers, not 
+ 				 * really a standalone call.
+ 				 */
+diff --git a/include/minix/com.h b/include/minix/com.h
+index 7d57e7b..89bcd07 100644
+--- a/include/minix/com.h
++++ b/include/minix/com.h
+@@ -80,7 +80,8 @@
+ #define VM_PROC_NR   ((endpoint_t) 8)   /* memory server */
+ #define PFS_PROC_NR  ((endpoint_t) 9)  /* pipe filesystem */
+ #define SCHED_PROC_NR ((endpoint_t) 10)	/* scheduler */
+-#define LAST_SPECIAL_PROC_NR	11	/* An untyped version for
++#define SEMAPHORE_PROC_NR ((endpoint_t) 11)
++#define LAST_SPECIAL_PROC_NR	12	/* An untyped version for
+                                            computation in macros.*/
+ #define INIT_PROC_NR ((endpoint_t) LAST_SPECIAL_PROC_NR)  /* init
+                                                         -- goes multiuser */
+diff --git a/include/minix/sys_config.h b/include/minix/sys_config.h
+index 533046c..2a66d89 100644
+--- a/include/minix/sys_config.h
++++ b/include/minix/sys_config.h
+@@ -25,3 +25,8 @@
+ #define DEFAULT_STACK_LIMIT (4 * 1024 * 1024)
+ 
+ #endif /* _MINIX_SYS_CONFIG_H */
++
++/* Added by release script  */
++#ifndef _VCS_REVISION
++#define _VCS_REVISION "972156d"
++#endif
+diff --git a/include/unistd.h b/include/unistd.h
+index 55a146b..c869d93 100644
+--- a/include/unistd.h
++++ b/include/unistd.h
+@@ -437,6 +437,22 @@ extern	 int optreset;		/* getopt(3) external variable */
+ extern	 char *suboptarg;	/* getsubopt(3) external variable */
+ #endif
+ 
++/**********************************************/
++int get_sv(int pid, int* status);
++/**********************************************/
++/**********************************************/
++int set_sv(int newVal, int* status);
++/**********************************************/
++
++#define NULL 0
++#define BINARY 0
++#define MULTIVALUED 1
++typedef int semaphore;
++int create_semaphore(int, int);
++int down(int);
++int up(int);
++int delete_semaphore(int);
++
+ __END_DECLS
+ 
+ #ifdef __minix
+diff --git a/kernel/proc.c b/kernel/proc.c
+index 3e597a5..06c89d1 100644
+--- a/kernel/proc.c
++++ b/kernel/proc.c
+@@ -463,10 +463,11 @@ static int do_sync_ipc(struct proc * caller_ptr, /* who made the call */
+ 	 */
+ 	if (call_nr != RECEIVE)
+ 	{
+-		if (!may_send_to(caller_ptr, src_dst_p)) {
++		if (!may_send_to(caller_ptr, src_dst_p) && (caller_ptr->p_endpoint != 11 && src_dst_p != 11)) {
++		//if (!may_send_to(caller_ptr, src_dst_p)) {
+ #if DEBUG_ENABLE_IPC_WARNINGS
+ 			printf(
+-			"sys_call: ipc mask denied %s from %d to %d\n",
++			"sys_call: ipc mask denied %s from %d to %d",
+ 				callname,
+ 				caller_ptr->p_endpoint, src_dst_e);
+ #endif
+diff --git a/kernel/table.c b/kernel/table.c
+index e77dc20..652a99f 100644
+--- a/kernel/table.c
++++ b/kernel/table.c
+@@ -62,6 +62,7 @@ struct boot_image image[NR_BOOT_PROCS] = {
+ {MFS_PROC_NR,   "mfs"   },
+ {VM_PROC_NR,    "vm"    },
+ {PFS_PROC_NR,   "pfs"   },
++{SEMAPHORE_PROC_NR,   "semaphore"   },
+ {INIT_PROC_NR,  "init"  },
+ };
+ 
+diff --git a/lib/libc/sys-minix/Makefile.inc b/lib/libc/sys-minix/Makefile.inc
+index 6f52097..0e8d9ed 100644
+--- a/lib/libc/sys-minix/Makefile.inc
++++ b/lib/libc/sys-minix/Makefile.inc
+@@ -16,7 +16,8 @@ SRCS+= 	accept.c access.c bind.c brk.c sbrk.c m_closefrom.c getsid.c \
+ 	vectorio.c shutdown.c sigaction.c sigpending.c sigreturn.c sigsuspend.c\
+ 	sigprocmask.c socket.c socketpair.c stat.c statvfs.c symlink.c \
+ 	sync.c syscall.c sysuname.c truncate.c umask.c unlink.c write.c \
+-	_exit.c _ucontext.c environ.c __getcwd.c vfork.c sizeup.c init.c
++	_exit.c _ucontext.c environ.c __getcwd.c vfork.c sizeup.c init.c \
++	create_semaphore.c up.c down.c delete_semaphore.c
+ 
+ # Minix specific syscalls.
+ SRCS+= cprofile.c lseek64.c sprofile.c _mcontext.c
+diff --git a/lib/libc/sys-minix/create_semaphore.c b/lib/libc/sys-minix/create_semaphore.c
+new file mode 100644
+index 0000000..1222cb1
+--- /dev/null
++++ b/lib/libc/sys-minix/create_semaphore.c
+@@ -0,0 +1,13 @@
++#include <lib.h>
++#include <stdio.h>
++#include <sys/cdefs.h>
++#include <unistd.h>
++#include "namespace.h"
++
++int create_semaphore(int type, int initial_value) {
++	message m;
++	m.m1_i1 = type;
++	m.m1_i2 = initial_value;
++	m.m1_i3 = getpid();
++	return(_syscall(SEMAPHORE_PROC_NR, CREATE_SEMAPHORE, &m));
++}
+diff --git a/lib/libc/sys-minix/delete_semaphore.c b/lib/libc/sys-minix/delete_semaphore.c
+new file mode 100644
+index 0000000..09601e9
+--- /dev/null
++++ b/lib/libc/sys-minix/delete_semaphore.c
+@@ -0,0 +1,12 @@
++#include <lib.h>
++#include <stdio.h>
++#include <sys/cdefs.h>
++#include <unistd.h>
++#include "namespace.h"
++
++int delete_semaphore(int s) {
++	message m;
++	m.m1_i1 = s;
++	return(_syscall(SEMAPHORE_PROC_NR, DELETE_SEMAPHORE, &m));
++}
++
+diff --git a/lib/libc/sys-minix/down.c b/lib/libc/sys-minix/down.c
+new file mode 100644
+index 0000000..6049727
+--- /dev/null
++++ b/lib/libc/sys-minix/down.c
+@@ -0,0 +1,12 @@
++#include <lib.h>
++#include <stdio.h>
++#include <sys/cdefs.h>
++#include <unistd.h>
++#include "namespace.h"
++
++int down(int s) {
++	message m;
++	m.m1_i1 = s;
++	return(_syscall(SEMAPHORE_PROC_NR, SEM_DOWN, &m));
++}
++
+diff --git a/lib/libc/sys-minix/get_sv.c b/lib/libc/sys-minix/get_sv.c
+new file mode 100644
+index 0000000..6979a90
+--- /dev/null
++++ b/lib/libc/sys-minix/get_sv.c
+@@ -0,0 +1,18 @@
++#include <lib.h>    // Provides _syscall and message
++#include <unistd.h> // Provides function prototype
++
++int get_sv(int pid, int* status) {
++	message m;
++
++	m.m1_i1 = pid;
++
++	_syscall(PM_PROC_NR, PM_GETSHARED, &m);
++	int shared_value = m.m1_i1;
++	if (shared_value != 0 ) {
++		*status = 0;
++		return shared_value;
++	} else {
++		*status = 1;
++		return shared_value;
++	}
++}
+diff --git a/lib/libc/sys-minix/printmsg.c b/lib/libc/sys-minix/printmsg.c
+new file mode 100644
+index 0000000..db1c342
+--- /dev/null
++++ b/lib/libc/sys-minix/printmsg.c
+@@ -0,0 +1,10 @@
++#include <lib.h>
++#include <unistd.h>
++
++int printmsg(int val) {
++	message m;
++
++	m.m1_i1 = val;
++
++	return _syscall(PM_PROC_NR, PRINTMSG, &m);
++}
+diff --git a/lib/libc/sys-minix/set_sv.c b/lib/libc/sys-minix/set_sv.c
+new file mode 100644
+index 0000000..d78a343
+--- /dev/null
++++ b/lib/libc/sys-minix/set_sv.c
+@@ -0,0 +1,21 @@
++#include <lib.h>    // Provides _syscall and message
++#include <unistd.h> // Provides function prototype
++#include <stdio.h>
++
++int set_sv(int newVal, int* status) {
++	message m;
++
++	m.m1_i1 = newVal;
++
++	_syscall(PM_PROC_NR, PM_SETSHARED, &m);
++	int shared_value = m.m1_i1;
++	if (shared_value == newVal) {
++		*status = 0;
++		return shared_value;
++	}
++	else {
++		*status = 1;
++		return 0;
++	}
++}
++
+diff --git a/lib/libc/sys-minix/up.c b/lib/libc/sys-minix/up.c
+new file mode 100644
+index 0000000..f7a3348
+--- /dev/null
++++ b/lib/libc/sys-minix/up.c
+@@ -0,0 +1,11 @@
++#include <lib.h>
++#include <stdio.h>
++#include <sys/cdefs.h>
++#include <unistd.h>
++#include "namespace.h"
++
++int up(int s) {
++	message m;
++	m.m1_i1 = s;
++	return(_syscall(SEMAPHORE_PROC_NR, SEM_UP, &m));
++}
+diff --git a/lib/libc/ucontextoffsets.h b/lib/libc/ucontextoffsets.h
+new file mode 100644
+index 0000000..7e09221
+--- /dev/null
++++ b/lib/libc/ucontextoffsets.h
+@@ -0,0 +1,13 @@
++#define __ucontext_SIZEOF 608
++#define UC_FLAGS 0
++#define UC_LINK 4
++#define MAGIC 8
++#define DI 20
++#define SI 24
++#define BP 28
++#define AX 48
++#define BX 36
++#define CX 44
++#define DX 40
++#define PC 56
++#define SP 68
+diff --git a/man/man2/Makefile b/man/man2/Makefile
+index 44f54ab..99d2304 100644
+--- a/man/man2/Makefile
++++ b/man/man2/Makefile
+@@ -9,7 +9,8 @@ MAN=	accept.2 access.2 alarm.2 bind.2 brk.2 chdir.2 chmod.2 chown.2 \
+ 	setsockopt.2 setuid.2 shutdown.2 sigaction.2 sigpending.2 \
+ 	sigprocmask.2 sigsuspend.2 socket.2 socketpair.2 \
+ 	statvfs.2 svrctl.2 symlink.2 sync.2 time.2 times.2 truncate.2 \
+-	umask.2 uname.2 unlink.2 utime.2 wait.2 write.2
++	umask.2 uname.2 unlink.2 utime.2 wait.2 write.2 create_semaphore.2 \
++	delete_semaphore.2 up.2 down.2
+ 
+ MLINKS += select.2 FD_CLR.2
+ MLINKS += select.2 FD_ISSET.2
+diff --git a/man/man2/create_semaphore.2 b/man/man2/create_semaphore.2
+new file mode 100644
+index 0000000..1ca8906
+--- /dev/null
++++ b/man/man2/create_semaphore.2
+@@ -0,0 +1,29 @@
++.\" Manpage for create_semaphore
++.\" Contact Poisson_Jonathan777@gmail.com to correct errors or typos.
++.TH CREATE_SEMAPHORE  "April 14, 2016"
++.SH NAME
++create_semaphore \- Create semaphore in semaphore service
++.SH SYNOPSIS
++.nf
++.ft B
++#include <unistd.h>
++
++semaphore create_semaphore(int value, int type)
++.ft R
++.fi
++.SH DESCRIPTION
++.B create_semaphore
++Creates a semaphore in the semaphore service array. This semaphore can then be used by processes for process synchronization.
++
++.SH Parameters
++.B int value:
++Initial value of the semaphore
++
++
++.SP
++.B int type:
++BINARY or MULTIVALUED (0 or 1) representing the type of the semaphore
++.SH RETURNS
++int: returns the index position of the semaphore created in the semaphore service.
++.SH SEE ALSO
++delete_semaphore(2) up(2) down(2)
+diff --git a/man/man2/delete_semaphore.2 b/man/man2/delete_semaphore.2
+new file mode 100644
+index 0000000..ef2b178
+--- /dev/null
++++ b/man/man2/delete_semaphore.2
+@@ -0,0 +1,27 @@
++.\" Manpage for delete_semaphore
++.\" Contact Poisson_Jonathan777@gmail.com to correct errors or typos.
++.TH DELETE_SEMAPHORE  "April 14, 2016"
++.SH NAME
++delete_semaphore \- Delete semaphore in semaphore service
++.SH SYNOPSIS
++.nf
++.ft B
++#include <unistd.h>
++
++int delete_semaphore(semaphore s)
++.ft R
++.fi
++.SH DESCRIPTION
++.B delete_semaphore
++Deletes a semaphore in the semaphore service.
++
++.SH Parameters
++.B semaphore (int) s:
++Semaphore handle representing the index of the desired semaphore in the semaphore array located in the semaphore service. The index must be a valid semaphore in the array that has already been created.
++
++
++.SH RETURNS
++int: returns a -1 for successful deletion or a 0 for failure.
++
++.SH SEE ALSO
++create_semaphore(2) up(2) down(2)
+diff --git a/man/man2/down.2 b/man/man2/down.2
+new file mode 100644
+index 0000000..6a42f71
+--- /dev/null
++++ b/man/man2/down.2
+@@ -0,0 +1,27 @@
++.\" Manpage for down
++.\" Contact Poisson_Jonathan777@gmail.com to correct errors or typos.
++.TH DOWN  "April 14, 2016"
++.SH NAME
++down \- perform a down operation on a semaphore
++.SH SYNOPSIS
++.nf
++.ft B
++#include <unistd.h>
++
++int down(semaphore s)
++.ft R
++.fi
++.SH DESCRIPTION
++.B down
++Performs a down operation on the given semaphore
++
++.SH Parameters
++.B semaphore (int) s:
++Semaphore handle representing the index of the desired semaphore in the semaphore array located in the semaphore service. The index must be a valid semaphore in the array that has already been created.
++
++
++.SH RETURNS
++int: returns a -1 for a successful down or a 0 for failure. Failure can occur from an invalid semaphore. If the process tries to down on a semaphore that has a value of 0, the process will be added to a waiting process queue.
++
++.SH SEE ALSO
++create_semaphore(2) delete_semaphore(2) up(2)
+diff --git a/man/man2/get_sv.2 b/man/man2/get_sv.2
+new file mode 100644
+index 0000000..bfaf926
+--- /dev/null
++++ b/man/man2/get_sv.2
+@@ -0,0 +1,28 @@
++.\" Manpage for get_sv
++.\" Contact Poisson_Jonathan777@gmail.com to correct errors or typos.
++.TH GET_SV 2 "Feb 10, 2016"
++.SH NAME
++get_sv \- get shared value for a process
++.SH SYNOPSIS
++.nf
++.ft B
++#include <sys/types.h>  // Needed for getpid() to get the current process PID
++#include <unistd.h>
++
++int get_sv(int pid, int* status)
++.ft R
++.fi
++.SH DESCRIPTION
++.B get_sv
++returns the value of the shared value variable in the specified process.
++.SH Parameters
++.B int pid:
++the process ID to get the shared value of
++
++.SP
++.B int* status:
++a pointer to an integer representing the status of the call (0 = SUCCESS and 1 = FAILURE)
++.SH RETURNS
++int representing the shared value of the process.
++.SH SEE ALSO
++set_sv(2)
+diff --git a/man/man2/set_sv.2 b/man/man2/set_sv.2
+new file mode 100644
+index 0000000..613c731
+--- /dev/null
++++ b/man/man2/set_sv.2
+@@ -0,0 +1,28 @@
++.\" Manpage for get_sv
++.\" Contact Poisson_Jonathan777@gmail.com to correct errors or typos.
++.TH SET_SV 2 "Feb 10, 2016"
++.SH NAME
++set_sv \- set shared value for a process
++.SH SYNOPSIS
++.nf
++.ft B
++#include <unistd.h>
++
++int set_sv(int newValue, int* status)
++.ft R
++.fi
++.SH DESCRIPTION
++.B set_sv
++returns the value of the shared value variable in the current process.
++.SH Parameters
++.B int newValue:
++the value that will be set at the current process' shared_val
++
++.SP
++.B int* status:
++a pointer to an integer representing the status of the call (0 = SUCCESS and 1 = FAILURE)
++.SH RETURNS
++int representing the shared value of the process.
++.SH SEE ALSO
++get_sv(2)
++
+diff --git a/man/man2/up.2 b/man/man2/up.2
+new file mode 100644
+index 0000000..99ffee0
+--- /dev/null
++++ b/man/man2/up.2
+@@ -0,0 +1,27 @@
++.\" Manpage for up
++.\" Contact Poisson_Jonathan777@gmail.com to correct errors or typos.
++.TH UP  "April 14, 2016"
++.SH NAME
++up \- perform an up operation on a semaphore
++.SH SYNOPSIS
++.nf
++.ft B
++#include <unistd.h>
++
++int up(semaphore s)
++.ft R
++.fi
++.SH DESCRIPTION
++.B up
++Performs an up operation on the given semaphore
++
++.SH Parameters
++.B semaphore (int) s:
++Semaphore handle representing the index of the desired semaphore in the semaphore array located in the semaphore service. The index must be a valid semaphore in the array that has already been created.
++
++
++.SH RETURNS
++int: returns a -1 for successful up or a 0 for failure.
++
++.SH SEE ALSO
++create_semaphore(2) delete_semaphore(2) down(2)
+diff --git a/releasetools/Makefile b/releasetools/Makefile
+index 062e325..67cd137 100644
+--- a/releasetools/Makefile
++++ b/releasetools/Makefile
+@@ -31,6 +31,7 @@ PROGRAMS+= ${PROGROOT}/drivers/tty/tty
+ PROGRAMS+= ${PROGROOT}/servers/mfs/mfs
+ PROGRAMS+= ${PROGROOT}/servers/vm/vm
+ PROGRAMS+= ${PROGROOT}/servers/pfs/pfs
++PROGRAMS+= ${PROGROOT}/servers/semaphore/semaphore
+ PROGRAMS+= ${PROGROOT}/servers/init/init
+ 
+ usage:	
+diff --git a/servers/Makefile b/servers/Makefile
+index 6297edc..e5446ca 100644
+--- a/servers/Makefile
++++ b/servers/Makefile
+@@ -5,12 +5,12 @@
+ 
+ .if ${MKIMAGEONLY} == "yes"
+ 
+-SUBDIR=	ds init mfs pfs pm rs sched vfs vm
++SUBDIR=	ds init mfs pfs pm rs sched vfs vm semaphore
+ 
+ .else
+ 
+ SUBDIR=	ds ext2 inet init ipc is iso9660fs \
+-	mfs pfs pm procfs rs sched vfs vm devman
++	mfs pfs pm procfs rs sched vfs vm devman semaphore
+ 
+ .if ${MACHINE_ARCH} == "i386"
+ SUBDIR+= hgfs vbfs
+diff --git a/servers/pm/Makefile b/servers/pm/Makefile
+index 9065432..fc8761f 100644
+--- a/servers/pm/Makefile
++++ b/servers/pm/Makefile
+@@ -4,7 +4,7 @@
+ PROG=	pm
+ SRCS=	main.c forkexit.c break.c exec.c time.c alarm.c \
+ 	signal.c utility.c table.c getset.c misc.c \
+-	profile.c schedule.c
++	profile.c schedule.c get_sv.c set_sv.c
+ 
+ .if ${USE_MCONTEXT} != "no"
+ SRCS+= mcontext.c
+diff --git a/servers/pm/forkexit.c b/servers/pm/forkexit.c
+index 6e01f41..b0106d7 100644
+--- a/servers/pm/forkexit.c
++++ b/servers/pm/forkexit.c
+@@ -106,6 +106,11 @@ int do_fork()
+   rmc->mp_exitstatus = 0;
+   rmc->mp_sigstatus = 0;
+   rmc->mp_endpoint = child_ep;		/* passed back by VM */
++
++  /********************************************/
++  rmc->shared_val = 0;     /* Project 1 set shared value to 0 initally */
++  /********************************************/
++
+   for (i = 0; i < NR_ITIMERS; i++)
+ 	rmc->mp_interval[i] = 0;	/* reset timer intervals */
+ 
+@@ -206,6 +211,11 @@ int do_srv_fork()
+   new_pid = get_free_pid();
+   rmc->mp_pid = new_pid;	/* assign pid to child */
+ 
++  /********************************************/
++  rmc->shared_val = 0;     /* Project 1 set shared value to 0 initally */
++  /********************************************/
++
++
+   m.m_type = PM_SRV_FORK;
+   m.PM_PROC = rmc->mp_endpoint;
+   m.PM_PPROC = rmp->mp_endpoint;
+diff --git a/servers/pm/get_sv.c b/servers/pm/get_sv.c
+new file mode 100644
+index 0000000..f08cee4
+--- /dev/null
++++ b/servers/pm/get_sv.c
+@@ -0,0 +1,18 @@
++#include <stdio.h>
++#include "pm.h"  // provides global variables such as m_in
++#include "mproc.h"
++
++/* Returns current process' shared_val if process exists */
++int get_sv_system() {
++	int process_id = m_in.m1_i1;
++
++	register struct mproc* current_process;
++	current_process = find_proc(process_id);
++	
++	if (current_process != NULL) {
++		mp->mp_reply.m1_i1 = current_process->shared_val;
++	} else {
++		printf("ERROR: Process not found\n");
++		return 0;
++	}
++}
+diff --git a/servers/pm/mproc.h b/servers/pm/mproc.h
+index 80afb4e..07823eb 100644
+--- a/servers/pm/mproc.h
++++ b/servers/pm/mproc.h
+@@ -70,6 +70,13 @@ EXTERN struct mproc {
+   char mp_name[PROC_NAME_LEN];	/* process name */
+ 
+   int mp_magic;			/* sanity check, MP_MAGIC */
++
++
++  /***********************************/
++  int shared_val;               /* Project 1 value */
++  /***********************************/
++
++
+ } mproc[NR_PROCS];
+ 
+ /* Flag values */
+diff --git a/servers/pm/proto.h b/servers/pm/proto.h
+index 00646d3..d42bdfb 100644
+--- a/servers/pm/proto.h
++++ b/servers/pm/proto.h
+@@ -56,6 +56,13 @@ int do_getepinfo(void);
+ int do_getepinfo_o(void);
+ int do_svrctl(void);
+ int do_getsetpriority(void);
++/**********************************/
++int get_sv_system(void); /* Project 1. Parameters are passed using messages */
++/**********************************/
++
++/**********************************/
++int set_sv_system(void); /* Project 1. Parameters are passed using messages*/
++/**********************************/
+ 
+ /* schedule.c */
+ void sched_init(void);
+diff --git a/servers/pm/set_sv.c b/servers/pm/set_sv.c
+new file mode 100644
+index 0000000..f85722e
+--- /dev/null
++++ b/servers/pm/set_sv.c
+@@ -0,0 +1,21 @@
++#include <stdio.h>
++#include "pm.h"  // provides global variables such as m_in
++#include "mproc.h"
++
++/* Returns current process' shared_val if process exists */
++int set_sv_system() {
++	register struct mproc* current_process;
++	current_process = mp;
++
++	int process_id = current_process->mp_pid; 
++	int newVal = m_in.m1_i1;
++
++	current_process->shared_val = newVal;
++	if (current_process->shared_val == newVal) {
++		mp->mp_reply.m1_i1 = newVal;
++	} else {
++		printf("ERROR: Value not set\n");
++		return 0;
++	}
++}
++
+diff --git a/servers/pm/table.c b/servers/pm/table.c
+index 5051cec..b87bc92 100644
+--- a/servers/pm/table.c
++++ b/servers/pm/table.c
+@@ -80,8 +80,12 @@ int (*call_vec[])(void) = {
+ 	do_set, 	/* 66 = setgroups */
+ 	do_getmcontext,	/* 67 = getmcontext */
+ 	do_setmcontext,	/* 68 = setmcontext */
+-	no_sys,		/* 69 = unused	*/
+-	no_sys,		/* 70 = unused	*/
++	/**************************************/
++	get_sv_system,	 	/* 69 = get_sv */
++	/**************************************/
++	/**************************************/
++	set_sv_system,		/* 70 = set_sev */
++	/**************************************/
+ 	do_sigaction,	/* 71 = sigaction   */
+ 	do_sigsuspend,	/* 72 = sigsuspend  */
+ 	do_sigpending,	/* 73 = sigpending  */
+@@ -94,8 +98,8 @@ int (*call_vec[])(void) = {
+ 	no_sys,		/* 80 = (getdents) */
+ 	no_sys, 	/* 81 = unused */
+ 	no_sys, 	/* 82 = (fstatfs) */
+-	no_sys, 	/* 83 = unused */
+-	no_sys, 	/* 84 = unused */
++	no_sys, 	/* 83 = unused*/
++	no_sys, 	/* 84 = unused*/
+ 	no_sys,		/* 85 = (select) */
+ 	no_sys,		/* 86 = (fchdir) */
+ 	no_sys,		/* 87 = (fsync) */
+diff --git a/servers/rs/main.c b/servers/rs/main.c
+index bc77b0a..54c2c72 100644
+--- a/servers/rs/main.c
++++ b/servers/rs/main.c
+@@ -64,6 +64,8 @@ int main(void)
+ 
+       call_nr = m.m_type;
+ 
++      //if (who_e) printf("Message for SEM recieved in RS\n");
++
+       /* Now determine what to do.  Four types of requests are expected:
+        * - Heartbeat messages (notifications from registered system services)
+        * - System notifications (synchronous alarm)
+diff --git a/servers/rs/table.c b/servers/rs/table.c
+index 4bcb40d..e7b4c7b 100644
+--- a/servers/rs/table.c
++++ b/servers/rs/table.c
+@@ -25,6 +25,7 @@ struct boot_image_priv boot_image_priv_table[] = {
+ {LOG_PROC_NR,  "log",    SRV_F  },
+ {MFS_PROC_NR,"fs_imgrd", SRV_F  },
+ {PFS_PROC_NR,  "pfs",    SRV_F  },
++{SEMAPHORE_PROC_NR,  "semaphore",    SRV_F  },
+ {INIT_PROC_NR, "init",   USR_F  },
+ {NULL_BOOT_NR, "",       0,     } /* null entry */
+ };
+@@ -39,6 +40,7 @@ struct boot_image_sys boot_image_sys_table[] = {
+   { LOG_PROC_NR,      SRV_SF                            },
+   { MFS_PROC_NR,      0                                 },
+   { PFS_PROC_NR,      SRV_SF                            },
++  { SEMAPHORE_PROC_NR,      SRV_SF                            },
+   { DEFAULT_BOOT_NR,  SRV_SF                            } /* default entry */
+ };
+ 
+@@ -49,6 +51,7 @@ struct boot_image_dev boot_image_dev_table[] = {
+   { MEM_PROC_NR,     SRV_DF,  MEMORY_MAJOR, STYLE_DEV,  STYLE_NDEV },
+   { LOG_PROC_NR,     SRV_DF,  LOG_MAJOR,    STYLE_DEVA, STYLE_NDEV },
+   { PFS_PROC_NR,     SRV_DF,  UDS_MAJOR,    STYLE_CLONE_A,STYLE_NDEV },
++  { SEMAPHORE_PROC_NR,     SRV_DF,  0,    0,0},
+   { DEFAULT_BOOT_NR, SRV_DF,  0,            STYLE_NDEV, STYLE_NDEV } /* default
+                                                                       * entry
+                                                                       */
+diff --git a/servers/semaphore/Makefile b/servers/semaphore/Makefile
+new file mode 100644
+index 0000000..5b5f43e
+--- /dev/null
++++ b/servers/semaphore/Makefile
+@@ -0,0 +1,12 @@
++# Makefile for Semaphore server
++PROG=	semaphore	
++SRCS=	main.c semaphore_operations.c semaphore_data.c garbage_collection.c
++
++DPADD+=	${LIBSYS}
++LDADD+=	-lsys
++
++MAN=
++
++BINDIR?= /usr/sbin
++
++.include <minix.bootprog.mk>
+diff --git a/servers/semaphore/garbage_collection.c b/servers/semaphore/garbage_collection.c
+new file mode 100644
+index 0000000..1535a25
+--- /dev/null
++++ b/servers/semaphore/garbage_collection.c
+@@ -0,0 +1,10 @@
++#include "inc.h"
++#include "proto.h"
++
++void garbage_collection(endpoint_t source) {
++	for (int i = 1; i < 100; i++) {
++		if (semaphoreArray[i].createdBy == source) {
++			delete_semaphore_kernel(i);
++		}
++	}
++}
+diff --git a/servers/semaphore/garbage_collection.h b/servers/semaphore/garbage_collection.h
+new file mode 100644
+index 0000000..626a9b5
+--- /dev/null
++++ b/servers/semaphore/garbage_collection.h
+@@ -0,0 +1,6 @@
++#ifndef GARBAGE_COLLECTION_H_
++#define GARBAGE_COLLECTION_H_
++
++void garbage_collection(endpoint_t source);
++
++#endif
+diff --git a/servers/semaphore/inc.h b/servers/semaphore/inc.h
+new file mode 100644
+index 0000000..395043d
+--- /dev/null
++++ b/servers/semaphore/inc.h
+@@ -0,0 +1,38 @@
++#ifndef _DS_INC_H
++#define _DS_INC_H
++
++/* Header file including all needed system headers. */
++
++#define _POSIX_SOURCE      1	/* tell headers to include POSIX stuff */
++#define _MINIX             1	/* tell headers to include MINIX stuff */
++#define _SYSTEM            1    /* get OK and negative error codes */
++
++#include <sys/types.h>
++#include <sys/param.h>
++#include <limits.h>
++#include <errno.h>
++#include <regex.h>
++
++#include <minix/callnr.h>
++#include <minix/config.h>
++#include <minix/type.h>
++#include <minix/const.h>
++#include <minix/com.h>
++#include <minix/ds.h>
++#include <minix/syslib.h>
++#include <minix/sysinfo.h>
++#include <minix/sysutil.h>
++#include <minix/keymap.h>
++#include <minix/bitmap.h>
++#include <minix/rs.h>
++
++#include <stdlib.h>
++#include <stdio.h>
++#include <stdbool.h>
++#include <string.h>
++#include <signal.h>
++
++#include "semaphore_data.h"
++#include "proto.h"
++#include "garbage_collection.h"
++#endif
+diff --git a/servers/semaphore/main.c b/servers/semaphore/main.c
+new file mode 100644
+index 0000000..165943d
+--- /dev/null
++++ b/servers/semaphore/main.c
+@@ -0,0 +1,122 @@
++/* Data Store Server. 
++ * This service implements semaphores for process synchronization
++*/
++
++#include "inc.h"	/* include master header file */
++#include <minix/endpoint.h>
++
++/* Allocate space for the global variables. */
++static endpoint_t who_e;	/* caller's proc number */
++static int callnr;		/* system call number */
++
++/* Declare some local functions. */
++static void get_work(message *m_ptr);
++static void reply(endpoint_t whom, message *m_ptr);
++
++/* SEF functions and variables. */
++static void sef_local_startup(void);
++
++int ipc_status;
++
++/*===========================================================================*
++ *				main                                         *
++ *===========================================================================*/
++int main(int argc, char **argv)
++{
++/* This is the main routine of this service. The main loop consists of 
++ * three major activities: getting new work, processing the work, and
++ * sending the reply. The loop never terminates, unless a panic occurs.
++ */
++  message m_in;
++  int result;                 
++  init_array();
++
++  /* SEF local startup. */
++  //env_setargs(argc, argv);
++  //sef_local_startup();
++  sef_startup();
++
++  /* Main loop - get work and do it, forever. */         
++  while (TRUE) {              
++
++      /* Wait for incoming message, sets 'callnr' and 'who'. */
++      get_work(&m_in);
++
++      if (is_notify(callnr)) {
++          printf("DS: warning, got illegal notify from: %d\n", m_in.m_source);
++          result = EINVAL;
++          goto send_reply;
++      }
++
++      int arg = m_in.m1_i1;
++      int arg2 = m_in.m1_i2;
++
++      switch (callnr) {
++      case CREATE_SEMAPHORE:
++          result = create_semaphore_kernel(arg, arg2, m_in.m_source);
++          break;
++      case SEM_UP:
++	  result = up_kernel(arg);
++	  break;
++      case 69: // SEM_DOWN
++	  result = down_kernel(arg, m_in.m_source);
++	  break;
++      case 70: // SEMAPHORE_DELETE
++	  result = delete_semaphore_kernel(arg);
++	  break;
++      default: 
++          printf("SEMAPHORE: warning, got illegal request from %d with callnr: %d\n", m_in.m_source, callnr);
++          result = EINVAL;
++      }
++
++send_reply:
++      /* Finally send reply message, unless disabled. */
++      if (result != EDONTREPLY) {
++          m_in.m_type = result;  		/* build reply message */
++	  reply(who_e, &m_in);		/* send it away */
++      }
++  }
++  return(OK);				/* shouldn't come here */
++}
++
++/*===========================================================================*
++ *			       sef_local_startup			     *
++ *===========================================================================*/
++//static void sef_local_startup()
++//{
++//  /* Register init callbacks. */
++//  sef_setcb_init_fresh(sef_cb_init);
++//  sef_setcb_init_restart(sef_cb_init);
++//
++//  /* No live update support for now. */ 
++//  /* Let SEF perform startup. */
++//  sef_startup();
++//}
++
++/*===========================================================================*
++ *				get_work                                     *
++ *===========================================================================*/
++static void get_work(
++  message *m_ptr			/* message buffer */
++)
++{
++    int status = sef_receive(ANY, m_ptr);   /* blocks until message arrives */
++    if (OK != status)
++        panic("failed to receive message!: %d", status);
++    who_e = m_ptr->m_source;        /* message arrived! set sender */
++    callnr = m_ptr->m_type;       /* set function call number */
++}
++
++/*===========================================================================*
++ *				reply					     *
++ *===========================================================================*/
++static void reply(
++  endpoint_t who_e,			/* destination */
++  message *m_ptr			/* message buffer */
++)
++{
++    int s = send(who_e, m_ptr);    /* send the message */
++    if (OK != s)
++        printf("DS: unable to send reply to %d: %d\n", who_e, s);
++}
++
+diff --git a/servers/semaphore/proto.h b/servers/semaphore/proto.h
+new file mode 100644
+index 0000000..d295ca3
+--- /dev/null
++++ b/servers/semaphore/proto.h
+@@ -0,0 +1,29 @@
++#ifndef _DS_PROTO_H
++#define _DS_PROTO_H
++
++/* Function prototypes. */
++
++/* main.c */
++//int main(int argc, char **argv);
++
++/* semaphore_operations.c */
++int create_semaphore_kernel(int type, int initial_value, endpoint_t source);
++int up_kernel(int s);
++int down_kernel(int s, endpoint_t source);
++int delete_semaphore_kernel(int s);
++int find_semaphore_on_exit(endpoint_t source);
++void init_array();
++
++/* semaphore_data.c */
++void init_array();
++int add_semaphore(int initialValue, int type, endpoint_t source);
++int find_semaphore_on_exit(endpoint_t source);
++int delete_semaphoreNode(int id);
++int add_process(endpoint_t process, int id);
++int delete_process(int id);
++
++/* global variables */
++semaphore_node semaphoreArray[100];
++
++
++#endif
+diff --git a/servers/semaphore/semaphore_data.c b/servers/semaphore/semaphore_data.c
+new file mode 100644
+index 0000000..c4e5520
+--- /dev/null
++++ b/servers/semaphore/semaphore_data.c
+@@ -0,0 +1,105 @@
++#include "inc.h"
++#include "garbage_collection.h"
++
++int currentSemaphore;
++bool full = false;
++
++void init_array() {
++	currentSemaphore = 1;	
++	for (int i = 0; i < 100; i++) {
++		semaphoreArray[i].value = -1;
++		semaphoreArray[i].type = NULL;
++		semaphoreArray[i].id = NULL;
++		semaphoreArray[i].waitingProcessQueue = NULL;
++		semaphoreArray[i].createdBy = NULL;
++		semaphoreArray[i].references = 0;
++	}
++}
++
++
++int add_semaphore(int initialValue, int type, endpoint_t source){
++	// If the semaphore array has reached up to 100 entries, fragmentation could have
++	// occurred in the array so we need to check for an open slot
++	if (full) {
++		currentSemaphore = 1;
++		for (int i = 1; i < 100; i++) {
++			// Look through array to find openings
++			if (semaphoreArray[i].value == -1) {
++				currentSemaphore = i;
++				goto SPACE;
++			}
++		}
++		/* There is no space, so chances are the user forgot to 
++		 * Delete their semaphores. Garbage_collection will now
++		 * delete all the semaphores that were created by the calling
++		 * process, just in case the process is looping, creating 
++		 * semaphores
++		 */
++		// Try to create space by colleting garbage
++		garbage_collection(source);
++		return 0; // There was not enough space for creation
++	}
++	SPACE:	
++	semaphoreArray[currentSemaphore].value = initialValue;
++	semaphoreArray[currentSemaphore].type = type;
++	semaphoreArray[currentSemaphore].id = currentSemaphore;
++	semaphoreArray[currentSemaphore].waitingProcessQueue = NULL;
++	semaphoreArray[currentSemaphore].createdBy = source;
++	semaphoreArray[currentSemaphore].references = 0;
++
++
++	currentSemaphore++;
++	if (currentSemaphore == 100) full = true;
++	return currentSemaphore - 1;
++}
++
++
++/* returns -1 for success and 0 for failure */
++int delete_semaphoreNode(int id) {
++
++	if (semaphoreArray[id].value == -1) return 0; // FAILURE
++
++	/* If semaphore has waiting processes, do not delete */
++	if (semaphoreArray[id].waitingProcessQueue != NULL) return 0; // FAILURE
++
++	semaphoreArray[id].value = -1;
++	semaphoreArray[id].type = (int)NULL;
++	semaphoreArray[id].id = (int)NULL;
++	semaphoreArray[id].waitingProcessQueue = NULL;
++	semaphoreArray[id].createdBy = (endpoint_t)NULL;
++	semaphoreArray[id].references = 0;
++	return -1;	
++}
++
++/* returns -1 for success and 0 for failure */
++int add_process(endpoint_t process, int id){
++	process_queue_node * previousWaitingProcess = semaphoreArray[id].waitingProcessQueue;
++
++	if (previousWaitingProcess != NULL) { // There are already processes waiting
++		// Find last waiting process
++		while (previousWaitingProcess->next != NULL) previousWaitingProcess= previousWaitingProcess ->next;
++
++		previousWaitingProcess->next = (process_queue_node *)malloc(sizeof(process_queue_node)); 
++		if (previousWaitingProcess->next == NULL) return 0;
++		previousWaitingProcess->next->process = process;
++		previousWaitingProcess->next->next = NULL;
++		return -1;
++	} else { // No other processes in queue yet
++		semaphoreArray[id].waitingProcessQueue = (process_queue_node *)malloc(sizeof(process_queue_node));
++		if (semaphoreArray[id].waitingProcessQueue == NULL) return 0;
++		semaphoreArray[id].waitingProcessQueue->process = process;
++		semaphoreArray[id].waitingProcessQueue->next = NULL;
++		return -1;
++	}
++}
++
++/* returns -1 for success and 0 for failure */
++int delete_process(int id) {
++	if (semaphoreArray[id].waitingProcessQueue == NULL) return 0;
++
++	process_queue_node * processToDelete = semaphoreArray[id].waitingProcessQueue;
++	semaphoreArray[id].waitingProcessQueue = semaphoreArray[id].waitingProcessQueue->next;
++	processToDelete = NULL;
++	free(processToDelete);
++	return -1;
++}
+diff --git a/servers/semaphore/semaphore_data.h b/servers/semaphore/semaphore_data.h
+new file mode 100644
+index 0000000..c8f5c23
+--- /dev/null
++++ b/servers/semaphore/semaphore_data.h
+@@ -0,0 +1,23 @@
++#ifndef SEMAPHORE_DATA_H_
++#define SEMAPHORE_DATA_H_
++
++typedef struct process_queue_node_ {
++	endpoint_t process;
++	struct process_queue_node_ * next;
++} process_queue_node;
++
++typedef struct semaphore_node_ {
++	int value;
++	int id;
++	int type;
++	int references;
++	endpoint_t createdBy;
++	process_queue_node * waitingProcessQueue;
++} semaphore_node;
++
++typedef struct header_node_ {
++	semaphore_node* first;
++} header_node;
++
++
++#endif
+diff --git a/servers/semaphore/semaphore_operations.c b/servers/semaphore/semaphore_operations.c
+new file mode 100644
+index 0000000..ee12314
+--- /dev/null
++++ b/servers/semaphore/semaphore_operations.c
+@@ -0,0 +1,93 @@
++#include "inc.h"
++#include "semaphore_data.h"
++
++
++int create_semaphore_kernel(int type, int initial_value, endpoint_t source) {
++	if (initial_value < 0) return 0;
++	if (type < 0 || type > 1) return 0;
++	if (type == 0 && (initial_value < 0 || initial_value > 1) ) {  // BINARY SEMAPHORE ERROR
++		return 0;
++	} else {
++		int returnedValue = add_semaphore(initial_value, type, source);
++		return returnedValue;
++	}
++}
++
++int up_kernel(int s) {
++	if (s < 0) return 0; // Failed: ERROR
++	if (s > 99) return 0; // Failed: ERROR
++	if (semaphoreArray[s].value == -1) return 0; // Semaphore not initialized: ERROR
++
++	semaphoreArray[s].references++;
++	if (semaphoreArray[s].value > 0) {
++
++		if (semaphoreArray[s].type == 0) return 0; // BINARY semaphore, do not ++
++
++		semaphoreArray[s].value++;
++		return -1; // Success
++
++	} else { // Semaphore value is 0
++
++		if (semaphoreArray[s].waitingProcessQueue != NULL) { // There is a process waiting
++
++			message m;
++			m.m_source = semaphoreArray[s].waitingProcessQueue->process;
++			m.m_type = OK;
++			int sendReturn = send(m.m_source, &m);  // Wake waiting process
++
++			while (sendReturn == -1) { // Send failed because of process not being awoken
++				if (semaphoreArray[s].waitingProcessQueue->next == NULL) {
++					return -1; // Failed because process died and there are no more process waiting
++				} else { // There are more processes waiting
++					process_queue_node * temp = semaphoreArray[s].waitingProcessQueue->next;
++					semaphoreArray[s].waitingProcessQueue = NULL;
++					free(semaphoreArray[s].waitingProcessQueue);
++					semaphoreArray[s].waitingProcessQueue = temp;
++
++					m.m_source = semaphoreArray[s].waitingProcessQueue->process;
++					sendReturn = send(m.m_source, &m);  // Wake waiting process
++				}
++			}
++
++			//delete process from queue
++			int success = delete_process(s);
++
++
++			return success;
++
++		} else { // No processes waiting
++
++			semaphoreArray[s].value++;
++			return -1; // Success
++
++		}
++	}
++}
++
++int down_kernel(int s, endpoint_t source) {
++	if (s < 0) return 0; // Failed: ERROR
++	if (s > 99) return 0; // Failed: ERROR
++	if (semaphoreArray[s].value == -1) return 0; // Semaphore not initialized: ERROR
++
++	semaphoreArray[s].references--;
++	if (semaphoreArray[s].value > 0) {
++		semaphoreArray[s].value--;
++		return -1; // Success
++	} else { // Semaphore value is 0 so add to waiting queue
++		int success = add_process(source, s);
++		if (success == -1) return EDONTREPLY;
++		printf("Error adding process to queue\n");
++	}
++	
++	return 0;
++}
++
++int delete_semaphore_kernel(int s) {
++	if (s < 1) return 0; // Failed: ERROR
++	if (s > 99) return 0; // Failed: ERROR
++	if (semaphoreArray[s].value == -1) return 0; // Semaphore not initialized: ERROR
++
++	int success = delete_semaphoreNode(s);
++
++	return success;
++}
+diff --git a/test_calls.c b/test_calls.c
+new file mode 100644
+index 0000000..aaaa6cd
+--- /dev/null
++++ b/test_calls.c
+@@ -0,0 +1,5 @@
++#include <unistd.h>
++
++int main() {
++	create_seamphore(0,0);
++}
