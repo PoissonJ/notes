@@ -930,10 +930,10 @@ index 0000000..165943d
 +      case SEM_UP:
 +	  result = up_kernel(arg);
 +	  break;
-+      case SEM_DOWN:
++      case 69: // SEM_DOWN
 +	  result = down_kernel(arg, m_in.m_source);
 +	  break;
-+      case DELETE_SEMAPHORE:
++      case 70: // SEMAPHORE_DELETE
 +	  result = delete_semaphore_kernel(arg);
 +	  break;
 +      default: 
